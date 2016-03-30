@@ -6,6 +6,38 @@
 		\subsection{Treiberpakete}
 		\subsection{Frameworks}
 	\section{Bilder von Kinect bekommen}
-	\subsection{Ansprechen innerhalb von ROS}
-	\subsubsection{Topics \& Nodes}
-	\subsubsection{image\_pipeline}
+		\subsection{Ansprechen innerhalb von ROS}
+			\subsubsection{Topics \& Nodes}
+			\subsubsection{image\_pipeline}
+	\section{OpenCV}
+		\subsection{Installation}
+			\begin{itemize}
+			\item Version 2.4.11 -> letzte Stabile V2.4 Release
+			\item Build from Source
+			\item cMake
+			\item Auswahl der enthaltenen Module für Makefile
+			\item make danach sudo make install
+			\end{itemize}
+		\subsection{Kopplung mit ROS}
+			\begin{itemize}
+			\item Installation ROS-Modul
+			\end{itemize}
+	\section{Robotino}
+		\subsection{robotino api2}
+		\begin{itemize}
+		\item robotino api2
+		\item eintrag in sources list
+		\item apt-get update / install robotino-api2
+		\end{itemize}
+		\subsection{robotino\_pkg}
+		\begin{itemize}
+		\item catkin workspace bauen
+		\item apt-get install ros-indigo-navigation
+		\item packet in catkin\_ws/src
+		\item robotino\_node/CMakelists.txt/include\_directories -> /usr/local/robotino/api2
+		\item catkin\_ws -> catkin\_make
+		\item catkin\_make install
+		\item source ~/catkin\_ws/devel/setup.bash
+		\end{itemize}
+		
+		
