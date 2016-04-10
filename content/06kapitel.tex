@@ -1,18 +1,52 @@
 %!TEX root = ../dokumentation.tex
 
-	\chapter{Erkennen von Hindernissen}
+	\chapter{Hindernisse}
 		\section{Definition von Hinderniss}
-		\begin{itemize}
-		\item opencv
-		\item cv-bridge
-		\item ros eigene sensor-msgs\\images Nachrichten in OpenCV format bringen
-		\item wo liegt der Unterschied?
-		\end{itemize}
-		\section{Objekte erkennen}
 		
+		
+		
+		\section{Objekte erkennen}
+					
+			\subsection{Methodik}
+				\begin{itemize}
+				\item was brauch ich dafür?
+				\item opencv
+				\item cv-bridge
+				\item ros eigene sensor-msgs\\images Nachrichten in OpenCV format bringen
+				\item wo liegt der Unterschied?
+				\item Installation ROS-Modul
+				\item Code erklären -> evtl Diagramm
+				\item in CMakelists.txt -> add\_executable + add\_library
+				\item anpassungen bezüglich graustufenbilder -> in image\_converter.cpp
+				\end{itemize}
+				
+				\begin{itemize}
+				\item Wie funktioniert das mit OpenCV
+				\item mit und ohne Farben möglich
+				\item Farbe verfolgt Object anhand der Bewegung von Farbwerten in jedem Pixel
+				\item findContours
+				\item inRange
+				\item ohne Farbe
+				\item Sequential Images
+				\item Pixel-änderungen -> vergleich mit vorgänger Bild -> veränderungen werden gekennzeichnet
+				\item absdiff -> braucht graustufe -> subtrahiert bild1 von bild2 und speichert in differenzbild
+				
+				\end{itemize}
 		\section{Objekte Identifizieren}
+		\begin{itemize}
+		\item lediglich Unterscheidung ob Roboter oder Hindernis
+		\item alles was nicht Roboter ist => Hindernis
+		\end{itemize}
+			\subsection{Unterscheiden zwischen Roboter und Objekt}
+			\begin{itemize}
+			\item Robotino identifizieren -> Alleinstellungsmerkmal
+			\item spezielles Muster? QR-Code? Abstraktes deutliches schwarz/weiß Design
+			\item Skelett des Robotino anfertigen?
+			\item Wie Perspektivische Unterschiede ausgleichen?
+			\end{itemize}
+		
 	\chapter{Reaktion auf Hindernisse}
-		\subsection{Grundsätzliche Verhaltensweise bei auftauchenden Hindernissen}
+		\section{Grundsätzliche Verhaltensweise bei auftauchenden Hindernissen}
 		\begin{itemize}
 		\item Hinderniss taucht im Bewegungsraum auf
 			\begin{itemize}
@@ -23,6 +57,6 @@
 				\item Hindernis stoppt und bewegt sich weiter -> Roboter bleibt solange stehen bis Hindernis den Bewegungsraum verlassen hat oder sich nicht mehr weiter im Raum bewegt(stillstand) 
 			\end{itemize}
 		\end{itemize}
-		\subsection{Kategorisieren von identifizierten Objekten}
-			\subsubsection{fortwährend bewegende Objekte}
-			\subsubsection{stillstehende Objekte}
+		\section{Kategorisieren von identifizierten Objekten}
+			\subsection{fortwährend bewegende Objekte}
+			\subsection{stillstehende Objekte}
