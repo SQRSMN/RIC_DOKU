@@ -2,19 +2,13 @@
 % Encoding: UTF-8
 
 
+
 @Article{kinect-georg,
   Title                    = {Kinect als Eingabegerät},
   Author                   = {Jan Georg},
 
   Owner                    = {simon},
   Timestamp                = {2016.04.25}
-}
-
-@Book{kinect-hacking,
-  Title                    = {Hacking the Kinect},
-  Author                   = {Kramer, Burrus, Echtler,Herrera, Parker},
-
-  Date                     = {2012}
 }
 
 @Misc{alpha-centauri-ueberlicht,
@@ -30,15 +24,8 @@
   Url                      = {http://www.br.de/mediathek/video/sendungen/alpha-centauri/alpha-centauri-ueberlichtgeschwindigkeit-harald-lesch100.html}
 }
 
-@Electronic{kinect-uug-chem,
-  Title                    = {Kinect-Programmierung},
-  Author                   = {Yvonne Mußmacher, Mario Haustein},
-  Language                 = {deutsch},
-  Month                    = {Januar},
-  Url                      = {https://www.tu-chemnitz.de/urz/stammtisch/rsrc/beamer.pdf},
-  Year                     = {2013},
-
-  Owner                    = {simon},
-  Timestamp                = {2016.04.26}
+@book{kinect-hacking,
+author = {Kramer, Burrus, Echtler,Herrera, Parker},
+title = {Hacking the Kinect},
+date = {2012},
 }
-
