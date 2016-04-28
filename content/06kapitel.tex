@@ -1,8 +1,29 @@
 %!TEX root = ../dokumentation.tex
 
 	\chapter{Hindernisse}
+	Die Interaktion mit seiner Umwelt ist ein essentieller Teil in der Anwendung autonomer Systeme. Besonders der Sicherheitsaspekt spielt hier eine primäre Rolle. Die Akzeptanz der potentiellen Nutzer wäre stark beeinträchtigt wenn die Unversehrtheit von umstehenden Lebewesen und Gegenständen nicht sichergestellt werden kann. Die Komplexität bei Umweltinteraktion zeigt sich besonders beim Auftreten dynamischer Events. Ein Beispiel hierfür ist das Erscheinen von Hindernissen im Bewegungsraum einer mobilen Plattform. Um auf solche Ereignisse angemessen zu reagieren müssen dynamische Objekte erkannt, verfolgt und identifiziert werden. Bei der Entkopptlung der Intelligenz vom Roboter selbst, eröffnet sich ein weiteres Problem. Die Unterscheidung zwischen einem dynamischen Objekt und der mobilen Plattform. Im folgenden \underline{Kapitel} soll ein Konzept für ein solches Szenario erarbeitet und umgesetzt werden.
+%	\begin{itemize}
+%	\item interaktion mit Umwelt essentiell für autonomes System
+%	\item Sicherheitsaspekt kein Verletzungsrisiko für umstehende Lebewesen durch Einsatz eines autonomen systems
+%	\item Wo besteht hier die Schwierigkeit
+%	\item Objekte erkennen
+%	\item Objekte verfolgen
+%	\item Objekte identifizieren
+%	\end{itemize}
 		\section{Definition von Hinderniss}
+		Die Definition lautet wie folgt: \"Etwas, was das direkte Erreichen eines Ziels, das Weiterkommen be- oder verhindert.\". \cite{duden-hinderniss} Dabei wird offengelassen welche Ursache das Hinderniss sein kann, Gegenstände und Lebewesen werden hier nicht unterschieden, somit wird im weiteren Verlauf lediglich die neutrale Form Objekt genutzt. Genauer von Objekten welche den Bewegungsraum der Mobilen Plattform betreten bzw. sich bereits darin befinden.
+		\begin{itemize}
+		\item Ein Objekt was sich im Bewegungsraum der Mobilen Plattform befindet.
+		\item Unterscheidung unterschiedlicher Hindernisse bzw Objekte durch Klassifizierung.
+		\item Notwendig da nicht auf jede Situation gleich reagiert werden kann = Fallunterscheidung. Klassifizierung Werkzeug für Fallunterscheidung.
+		\end{itemize}
 		
+		\begin{itemize}
+		\item dynamisches Objekt = Lebewesen oder Gegenstand welches den Bildbereich der Kamera betritt. Bewegt sich weiterhin auf einer festen Achse durch den Bewegungsraum der Plattform.
+		\item statisches Objekt = Lebewesen oder Gegenstand welches fest im Bewegungsraum der Plattform verweilt.
+		\item chaotisches Objekt = Lebewesen oder Gegenstand welches ohne vorhersehbares Muster im Bewegungsraum der Plattform umherwandelt, und in unregelmäßigen abständen für eine undefinierbare Zeit an einem fixen Punkt verweilt.
+		\item \underline{Blitz} Objekt = Lebewesen oder Gegenstand welches den Bewegungsraum der Mobilen Plattform nur sehr flach durchstreift i.e. den Bewegungsraum nicht tief betritt oder ihn lediglich tangiert, aber dennoch von der Raumüberwachung erfasst wird.
+		\end{itemize}
 		
 		
 		\section{Objekte erkennen}
@@ -12,7 +33,7 @@
 				\item was brauch ich dafür?
 				\item opencv
 				\item cv-bridge
-				\item ros eigene sensor-msgs\\images Nachrichten in OpenCV format bringen
+				\item ros eigene sensor-msgs images Nachrichten in OpenCV format bringen
 				\item wo liegt der Unterschied?
 				\item Installation ROS-Modul
 				\item Code erklären -> evtl Diagramm
