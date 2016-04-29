@@ -11,52 +11,81 @@
 %	\item Objekte identifizieren
 %	\end{itemize}
 		\section{Definition von Hinderniss}
-		Die Definition lautet wie folgt: \"Etwas, was das direkte Erreichen eines Ziels, das Weiterkommen be- oder verhindert.\". \cite{duden-hinderniss} Dabei wird offengelassen welche Ursache das Hinderniss sein kann, Gegenstände und Lebewesen werden hier nicht unterschieden, somit wird im weiteren Verlauf lediglich die neutrale Form Objekt genutzt. Genauer von Objekten welche den Bewegungsraum der Mobilen Plattform betreten bzw. sich bereits darin befinden.
-		\begin{itemize}
-		\item Ein Objekt was sich im Bewegungsraum der Mobilen Plattform befindet.
-		\item Unterscheidung unterschiedlicher Hindernisse bzw Objekte durch Klassifizierung.
-		\item Notwendig da nicht auf jede Situation gleich reagiert werden kann = Fallunterscheidung. Klassifizierung Werkzeug für Fallunterscheidung.
-		\end{itemize}
+		Die Definition lautet wie folgt: \"Etwas, was das direkte Erreichen eines Ziels, das Weiterkommen be- oder verhindert.\". \cite{duden-hinderniss} Dabei wird offengelassen welche Ursache das Hinderniss sein kann, Gegenstände und Lebewesen werden hier nicht unterschieden, somit wird im weiteren Verlauf lediglich die neutrale Form Objekt genutzt. Genauer von Objekten welche den Bewegungsraum der Mobilen Plattform betreten bzw. sich bereits darin befinden. Zusätzlich müssen Objekte anhand ihres Verhaltens Klassifiziert werden. Dies ist notwendig da nicht auf jede Situation mit dem selben Vorgehen reagiert werden kann. Dadurch entsteht die Möglichkeit auf Basis der definierten Klassen eine Fallunterscheidung mit dafür angepassten Reaktionsroutinen zu entwerfen.
+%		\begin{itemize}
+%		\item Ein Objekt was sich im Bewegungsraum der Mobilen Plattform befindet.
+%		\item Unterscheidung unterschiedlicher Hindernisse bzw Objekte durch Klassifizierung.
+%		\item Notwendig da nicht auf jede Situation gleich reagiert werden kann = F allunterscheidung. Klassifizierung Werkzeug für Fallunterscheidung.
+%		\end{itemize}
 		
 		\begin{itemize}
-		\item dynamisches Objekt = Lebewesen oder Gegenstand welches den Bildbereich der Kamera betritt. Bewegt sich weiterhin auf einer festen Achse durch den Bewegungsraum der Plattform.
-		\item statisches Objekt = Lebewesen oder Gegenstand welches fest im Bewegungsraum der Plattform verweilt.
-		\item chaotisches Objekt = Lebewesen oder Gegenstand welches ohne vorhersehbares Muster im Bewegungsraum der Plattform umherwandelt, und in unregelmäßigen abständen für eine undefinierbare Zeit an einem fixen Punkt verweilt.
+		\item dynamisches Objekt = Lebewesen oder Gegenstand welches den Bildbereich der Kamera betritt. Bewegt sich kontinuierlich auf einem festen Pfad durch den Bewegungsraum der Plattform.
+		\item statisches Objekt = Lebewesen oder Gegenstand welches in den Bewegungsraum der Plattform betritt und dort an einem festen Punkt verweilt.
+		\item chaotisches Objekt = Lebewesen oder Gegenstand welches ohne vorhersehbares Muster im Bewegungsraum der Plattform umherwandelt, und in unregelmäßigen Abständen für eine undefinierbare Zeit an einem fixen Punkt verweilt.
 		\item \underline{Blitz} Objekt = Lebewesen oder Gegenstand welches den Bewegungsraum der Mobilen Plattform nur sehr flach durchstreift i.e. den Bewegungsraum nicht tief betritt oder ihn lediglich tangiert, aber dennoch von der Raumüberwachung erfasst wird.
 		\end{itemize}
 		
 		
 		\section{Objekte erkennen}
+		Die Grundlage für jede Interaktion mit seiner Umgebung, unabhängig davon ob nun von einem Roboter oder einem Lebewesen gesprochen wird, bildet die Voraussetzung zu Erkennen und zu Verstehen was darin vorgeht. Bei Lebewesen wie Robotern geschieht dies über die Audio-Visuellen Schnittstellen des Körpers bzw. des Systems.
+%		\begin{itemize}
+%			\item Grundlage für Interaktion = erkennen
+%			\item Erkennen Anhand welcher Informationen? Arbeitsgrundlage?
+%			\item mehrere Ansätze zum Lösen des Problems
+%			\item Nutzung von OpenCV
+%			\item mit und ohne Farben möglich
+%			\item Farbe verfolgt Object anhand der Bewegung von Farbwerten in jedem Pixel
+%	%		\item findContours
+%	%		\item inRange
+%			\item ohne Farbe
+%			\item Sequential Images
+%		\end{itemize}
+		\subsection{Konzeptionelle Lösungsansätze}
+		Der Grundsätzliche Ansatz besteht darin die Umgebung mit einem Bildsensor zu überwachen und Veränderungen sichtbar zu machen und hervorzuheben. Dies geschieht durch den Abgleich von Inhalten über eine Serie von Bildern. Dieses Verfahren wird in einigen Publikationen als Frame-Analysis bezeichnet. Die Unterschiede der implementierten Vertreter dieses Verfahrens liegen in den beobachteten Merkmalen der Bilder. Im Verlauf des Projekts wurden drei Varianten verglichen. Für die Implementierung wurde OpenCV genutzt. Beweggründe für diese Entscheidung können dem Theoriekapitel über OpenCV entnommen werden.\\
+		\textbf{(ADD) Verweiss auf OpenCV-ref (ADD)}
+		\subsection{Sequential Images}
+		\begin{itemize}
+		\item Graustufenbild, monochrom
+		\item vergleicht Bild$f_0$ mit Nachfolger$f_1$
+		\item dabei wird für jeden Pixel die absolute Differenz gebildet.
+		\item Sind die Werte$w_i(f_0)$, $w_i(f_1)$ von Pixel$i$ in $f_0$ und $f_1$ identisch wird der Wert für diesen Pixel auf 0 gesetzt. Dabei handelt es sich um einen optimalen Punkt. In der reellen Anwendung dieses Verfahrens werden die Werte nur stark reduziert da durch die Dynamik der Lichtverhältnisse die Grauwerte des Pixels zwar nur marginal dafür allerdings konstant schwanken und dadurch die Wahrscheinlichkeit für das Eintreffen des  Idealfalls $w_i(f_0)$ = $w_i(f_1)$ nur sehr gering ist.
+		\item Durch dieses Verfahren werden dem Informationsgehalt die Gemeinsamkeiten beider Bilder entzogen, und nur die Veränderungen von $f_0$ zu $f_1$ verbleiben.
+		\item dadurch bekommt man ein Differenzbild welches die geänderten Pixel isoliert hervorhebt, was das erkennen dynamischer Objekte prinzipiell stark vereinfacht.
+		\end{itemize}
+	
+		\subsection{find Contour}
+		\begin{itemize}
+		\item RGB Bild
+		\item initialer Prozess = welcher Pixel hat welche Farbe
+		\item verfolgt die Farbänderung jedes Pixels mit Fokus auf Farbwert
+		\item sequential images legt Fokus auf Änderung im Allgemeinen = Änderung Grauwert bedeutet Änderung im Raum
+		\item Colour detection = "Wandern" von Farbwerten
+		\item benachbarter Bildpunkt nimmt Farbe an(Ausbreiten), $C(P_i) = C(P_i+1)$.
+		\item Farbwert wechselt von Pixel $P_i$ zu $P_i+1$, dabei nimmt $P_i$ einen anderen Farbwert an(Wandern). $C(P_i+1(f_1)) == C(P_i(f_0))$
+		\item detektiert Außenkante Konturen engl. contour von Objekten dabei Ausbreiten = Forderseite des Objekts. Wandern = Rückseite des Objekts
+		\item in einigen Implementierungen werden statt einzelnen Farbwerten Farbgruppen gebildet, um die Funktionalität gegenüber Einwirkungen von Lichtquellen Robuster zu gestalten. Durch die Farbgruppierung wird letztendlich ein Referenzwert gewählt und weitere ähnliche Werte hinzugefügt um eine Tolleranz zu erreichen.
+		\end{itemize}
+		\textbf{(ADD)4er \& 8er Nachbarschaft | Illustration der Merkmale(ADD)}
+
+		\subsection{Direkter Informationsgewinn aus Tiefenbildern}
 					
-			\subsection{Methodik}
-				\begin{itemize}
-				\item was brauch ich dafür?
-				\item opencv
+		\subsection{Implementierung}
+		\begin{itemize}
+				\item OpenCV = absdiff(absolute differential); braucht graustufe; benötigt 2 Bilder als eingabe liefert differenzielles Bild entweder in Bild1 zurück oder in übergebenen Ausgabespeicher
 				\item cv-bridge
 				\item ros eigene sensor-msgs images Nachrichten in OpenCV format bringen
 				\item wo liegt der Unterschied?
-				\item Installation ROS-Modul
 				\item Code erklären -> evtl Diagramm
 				\item in CMakelists.txt -> add\_executable + add\_library
 				\item anpassungen bezüglich graustufenbilder -> in image\_converter.cpp
-				\end{itemize}
-				
-				\begin{itemize}
-				\item Wie funktioniert das mit OpenCV
-				\item mit und ohne Farben möglich
-				\item Farbe verfolgt Object anhand der Bewegung von Farbwerten in jedem Pixel
-				\item findContours
-				\item inRange
-				\item ohne Farbe
-				\item Sequential Images
-				\item Pixel-änderungen -> vergleich mit vorgänger Bild -> veränderungen werden gekennzeichnet
-				\item absdiff -> braucht graustufe -> subtrahiert bild1 von bild2 und speichert in differenzbild
-				
-				\end{itemize}
+		\end{itemize}
+		\textbf{(ADD)relevante Codeschnippsel in listing und erklären; Programmablaufplan zeichnen(ADD)}				
+			
 		\section{Objekte Identifizieren}
 		\begin{itemize}
 		\item lediglich Unterscheidung ob Roboter oder Hindernis
 		\item alles was nicht Roboter ist => Hindernis
+		\item findobjekt ros
 		\end{itemize}
 			\subsection{Unterscheiden zwischen Roboter und Objekt}
 			\begin{itemize}
@@ -67,9 +96,12 @@
 			\end{itemize}
 		
 	\chapter{Reaktion auf Hindernisse}
-		\section{Grundsätzliche Verhaltensweise bei auftauchenden Hindernissen}
-		\begin{itemize}
-		\item Hinderniss taucht im Bewegungsraum auf
+	\begin{itemize}
+	\item bezug auf Klassifzierung
+	\item Fallunterscheidung verdeutlichen
+	\item Klassifikation anhand welcher Messwerte/Merkmale
+	\end{itemize}
+	\subsection{dynamische Objekte}
 			\begin{itemize}
 				\item Stop
 				\item Bewegungsanalyse
@@ -77,7 +109,6 @@
 				\item Hindernis stoppt und bewegt sich nicht mehr weiter -> Umgehung bestimmen, umfahren
 				\item Hindernis stoppt und bewegt sich weiter -> Roboter bleibt solange stehen bis Hindernis den Bewegungsraum verlassen hat oder sich nicht mehr weiter im Raum bewegt(stillstand) 
 			\end{itemize}
-		\end{itemize}
-		\section{Kategorisieren von identifizierten Objekten}
-			\subsection{fortwährend bewegende Objekte}
-			\subsection{stillstehende Objekte}
+	\subsection{statische Objekte}
+	\subsection{chaotische Objkte}
+	\subsection{Blitz Objekte}
