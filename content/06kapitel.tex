@@ -88,73 +88,225 @@
 %		\subsection{Direkter Informationsgewinn aus Tiefenbildern}
 					
 		\subsection{Implementierung V1}
+		Für die Implementierung der Objekterkennung wurde das \textit{sequential images} Verfahren angewandt. Der Grund hierfür war die Idee, direkt die Tiefenbilder der Kinect zu verwenden, da diese schon im 13-Bit Mono Format vorliegen. Die Funktionalität ist in einen ROS node eingebettet. Das Erzeugen des Differenzbildes wird mit der \textit{absdiff} Funktion der OpenCV-library erreicht. Dafür müssen zunächst die Bilddaten der Kinect aus dem ROS eigenen \textit{imageConstPtr}-Format in das von OpenCV verwendete \textit{CvImagePtr}-Format gewandelt werden. Hierfür wird die Konverter middleware cvBridge genutzt. \textbf{(ADD)Verweiß auf cvBridge in Vorarbeiten(ADD)}\\
 		
+		\begin{lstlisting}[caption=imageCallback Funktion des Objekt-Erkennungs nodes, label=imageCallback-V1, title=imageCallback-V1, language=C++]
+		void imageCallback(const sensor_msgs::ImageConstPtr& image)
+		{
+		sensor_msgs::ImageConstPtr imageInRos;
+		imageInRos = image;
+		
+		cv_bridge::CvImagePtr imageInCV = cv_bridge::toCvCopy(imageInRos);
+		
+		Mat matNow = imageInCV->image;
+		
+		if(firstrun == 1){
+		matMinusOne = matNow;
+		firstrun = 0;
+		}
+		
+		absdiff(matNow, matMinusOne, imageDiff);
+		matMinusOne = matNow;
+				
+		imshow("view_diff", imageDiff);
+		}
+		\end{lstlisting}
 		\begin{itemize}
-				\item Implementierung als ROS subscriber-node lauscht auf camera-depth-image topic von freenect\_launch
-				\item OpenCV Fkt absdiff(absolute differential); braucht graustufe; benötigt 2 Bilder als eingabe liefert differenzielles Bild entweder in Bild1 zurück oder in übergebenen Ausgabespeicher
-				\item ros eigene sensor-msgs images Nachrichten in OpenCV format bringen
-%				\item wo liegt der Unterschied?
-				\item in CMakelists.txt -> add\_executable + add\_library
-				\item anpassungen bezüglich graustufenbilder in image\_converter.cpp
-				\item Rauschen sehr instabil, Gauß Filter keinen Effekt
-				\item Tiefenbilder zu Abhängig von Beleuchtung; schlecht
+		\item Zeile 6: Konvertierung vom Datentyp imageConstPtr (ROS) zu CvImagePtr (OpenCV).
+		\item Zeile 8: Kopieren der Bilddaten des aktuellen Frames in eine Mat-Speicherzelle. Vorbereitung für die Differenzenbildung, absdiff benötigt nur die Bilddaten (Mat-Datentyp). CvImagePtr enthalten noch zusätzliche Meta-Informationen über den aktuellen Frame. Mehr Details können den Datentypenbeschreibungen am Ende dieses Kapitels entnommen werden.
+		\item Zeilen 10 bis 13: Während des Initialdurchlaufs liegt noch kein Vorgänger-Frame vor, dadurch wird in die Speicherzelle matMinusOne der aktuelle Frame geladen.
+		\item Zeile 15: Bilden des Differenzframes mit \textit{absdiff}. Die Funktionsattribute sind der aktuelle Frame, der Vorgängerframe sowie eine Speicherzelle des Typs Mat für die erzeugte Differenz.
+		\item Zeile 16: Hier wird der aktuelle Frame in die Speicherzelle \textit{matMinusOne} geladen, um bei der nächsten Iteration als Vorgängerframe zur Verfügung zu stehen.
+		\item Zeile 18: imshow gibt den Inhalt einer übergebenen Mat-Speicherzelle (hier das Differenzbild - \textit{imageDiff}) in einem Anzeigefenster mit dem Titel \textit{view\_diff} aus. Dies dient nur zu Debug-Zwecken um äußere Einflüsse wie die Ausleuchtung des Raumes und natürliches Licht und deren Auswirkungen auf das Differenzbild zu beobachten.
 		\end{itemize}
+		
+		Die Beobachtung der ersten Implementierung zeigte dass das Tiefenbild der Kinect nicht für das \textit{sequential images}-Verfahren geeignet ist. Das sehr starke Rauschen im Tiefenbild verhindert eine saubere Differenzbildung. Das Rauschen konnte auch durch Anwenden des Gauß-Filters nicht genug gemindert werden. Dies war der Anlass für eine zweite Implementierung.
+		
+		\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.7\textwidth]{../media/depth-diff}
+		\caption{Darstellung des Tiefenbildes links und des Differenzbildes rechts. Durch das Rauschen im Tiefenbild wird die Differenz stark beeinträchtigt und praktisch nicht Nutzbar.}
+		\label{fig:depth-diff}
+		\end{figure}
 
-		Unterschiede der beiden Bildcontainer:\\
-		 \begin{itemize}
-		 \item header | enthält diverse Infos über aktuellen Frame | std\_messages(kann int, String, double und weitere enthalten)
-		 \item height | Höhe in Pixel | unit32 \\ 
-		 \item width | Breite in Pixel | unit32\\
-		 \item encoding | Bildkodierung RGB-24, mono8, mono13, ... | String\\ 
-		 \item is\_bigendian | Orientierung des least significant bit | unit8\\
-		 \item step | Zeilenlänge in Bytes relatiert Anzahl Spalten | unit32\\
-		 \item data[] | Eigentlicher Bildinhalt als 2D-Array Spalten(step * Zeilenanzhal) | unit8\\
-		 \end{itemize}
-		 
-		 \begin{itemize}
-		 \item encoding | Bildkodierung RGB-24, mono8, mono13, ... | String\\ 
-		 \item image[] | Eigentlicher Bildinhalt als 2D-Array Spalten(step * Zeilenanzhal) | MAT\\ 
-		 \end{itemize}
-		\textbf{(ADD)relevante Codeschnippsel in listing und erklären; Programmablaufplan zeichnen(ADD)}
+		
+%		\begin{itemize}
+%		\item Warum "sequential images"; idee war Tiefenbilder zu verwenden da Tiefe = Graustufe
+%		\item 
+%		\end{itemize}
+%		\begin{itemize}
+%				\item Implementierung als ROS subscriber-node lauscht auf camera-depth-image topic von freenect\_launch
+%				\item OpenCV Fkt absdiff(absolute differential); braucht graustufe; benötigt 2 Bilder als eingabe liefert differenzielles Bild entweder in Bild1 zurück oder in übergebenen Ausgabespeicher
+%				\item ros eigene sensor-msgs images Nachrichten in OpenCV format bringen
+%				\item wo liegt der Unterschied?
+%				\item in CMakelists.txt -> add\_executable + add\_library
+%				\item anpassungen bezüglich graustufenbilder in image\_converter.cpp
+%				\item Rauschen sehr instabil, Gauß Filter keinen Effekt
+%				\item Tiefenbilder zu Abhängig von Beleuchtung; schlecht
+%		\end{itemize}
+
 						
 		\subsection{Implementierung V2}
-		\begin{itemize}
-		\item rgb to mono weniger interferenz durch natürliches Licht; automatisch stabiler
-		\item threshold sorgt für verteilung auf 2 Maxima, schwellwert-operation $I_p > \text{threshold} = \text{weiß}; I_p < \text{threshold} = \text{schwarz}$
-		\item abprüfen ob Frame weiße Elemente enthält
-		\item publish stop auf robotino-handler
-		\end{itemize}
-		\textbf{(ADD)PAP und Codeschnipsel(ADD)}			
-		\section{Objekte Identifizieren}
-		\begin{itemize}
-		\item lediglich Unterscheidung ob Roboter oder Hindernis
-		\item alles was nicht Roboter ist => Hindernis
-		\item findobjekt ros
-		\end{itemize}
-			\subsection{Unterscheiden zwischen Roboter und Objekt}
-			\begin{itemize}
-			\item Robotino identifizieren -> Alleinstellungsmerkmal
-			\item spezielles Muster? QR-Code? Abstraktes deutliches schwarz/weiß Design
-			\item Skelett des Robotino anfertigen?
-			\item Wie Perspektivische Unterschiede ausgleichen?
-			\end{itemize}
+		Die zweite Implementierung nutzt statt der Tiefenbilder das monochrome Bild des Kinect RGB-Sensors. Da RGB-Sensoren keine Bilder auf Basis eines IR-Meshes erzeugen, sondern lediglich die vorhandene Umgebungsbeleuchtung nutzen, weisen die damit erzeugten Bilder nahezu keine Interferrenzmuster durch natürliche IR-Strahlung auf. Der Differenzbildende Prozess hat sich im Vergleich zur erste Implementierung nicht verändert. Jedoch wurden Techniken zur Nachbearbeitung des Differenzbildes eingesetzt um das Ergebnis zu optimieren. Zum einen wurde die Threshold-Funktion von OpenCV verwendet welche den Kontrast des Bildes erhöht, um die Kanten sich bewegender Objekte deutlicher vom Hintergrund abzuheben. Anschließend wurde das durch die Threshold-Funktion entstandene Rauschen mit der Anwendung des Blur-Filters gemildert.\\
+%		\begin{itemize}
+%		\item rgb to mono weniger interferenz durch natürliches Licht; automatisch stabiler
+%		\item threshold sorgt für verteilung auf 2 Maxima, schwellwert-operation $I_p > \text{threshold} = \text{weiß}; I_p < \text{threshold} = \text{schwarz}$
+%		\item abprüfen ob Frame weiße Elemente enthält
+%		\item publish stop auf robotino-handler
+%		\end{itemize}
+		\textbf{(ADD)PAP und Codeschnipsel(ADD)}
+		\newpage
+		\begin{lstlisting}[caption=imageCallbackV2 Funktion des Objekt-Erkennungs nodes, label=imageCallback-V2, title=imageCallback-V2, language=C++]
+		void imageCallback(const sensor_msgs::ImageConstPtr& image)
+		{
+		sensor_msgs::ImageConstPtr imageInRos;
+		imageInRos = image;
 		
-	\chapter{Reaktion auf Hindernisse}
+		cv_bridge::CvImagePtr imageInCV = cv_bridge::toCvCopy(imageInRos);
+		
+		Mat matNow = imageInCV->image;
+		if(firstrun == 1){
+		matMinus1 = matNow;
+		firstrun = 0;
+		}
+		
+		absdiff(matMinus1, matNow, imageDiff);
+		matMinus1 = matNow;
+		Mat imageThresh;
+		threshold( imageDiff, imageThresh, 10, 255,0);
+		Mat imageBlur;
+		blur(imageThresh,imageBlur,cv::Size(10,10));
+		
+		    cv::imshow("view_mono", matNow);
+		    cv::imshow("view_diff", imageDiff);
+		    cv::imshow("view_thresh", imageThresh);
+		    cv::imshow("view_blur", imageBlur);
+		}
+		\end{lstlisting}
+		
+		\begin{itemize}
+				\item Zeile 17: Anwendung der Threshold Funktion auf das erzeugte Differenzbild. Threshold ist eine Schwellwert Operation. Sie korrigiert die Farbwerte für jeden Pixel in Abhängigkeit seines aktuellen Wertes. Ist sein Farbwert unterhalb des Schwellwert wird er auf den Minimalwert reduziert. Liegt seine Intensität oberhalb des Schwellwertes wird er auf den Maximalwert korrigiert. Die ersten beiden Attribute geben die Speicherzellen für das Eingabe bzw. Ausgabe Bild an. Der dritte Übergabewert ist der Schwellwert selbst. Der Maximalwert auf den die Werte $>$ Schwerllwert gesetzt werden sollen, ist das vierte Attribut. Zuletzt muss der Operations-Typ vorgegeben werden. Hier wurde mit $0$ die \textit{Binary}-Operation benutzt welche das oben beschriebene Verhalten triggert.
+				\item Zeile 19: Die Blur-Funktion der OpenCV-library kann zum Filtern von Rauschen genutzt werden. Der Effekt ähnelt dem Weichzeichnen, was einen verschmierenden Effekt hat. Dies wird durch das Anwenden eines Filters auf jeden Bildpunkt erreicht. Hier wurde der \textit{normalized box filter} genutzt. Er berechnet für jeden Pixel den Durchschnitt der Farbwerte seiner Nachbarpixel, und gleicht den eigenen Farbwert daran an. Das Attribut cv:Size() gibt den Kern(Nullvektor einer Matrix) des Filters an.
+		\end{itemize}
+		\cite{cv-filter}
+		\cite{unger13}
+		\cite{cv-thresh}
+				
+		\begin{figure}[H]
+		    \subfigure[monochrom]{\includegraphics[width=0.4\textwidth ]{media/image-mono.png}}
+		    \subfigure[Differenz]{\includegraphics[width=0.4\textwidth]{media/image-diff.png}}
+		\caption{Darstellung des monochromen Ursprungsbild der Kinect, rechts davon das damit erzeugte Differenzbild.}
+		\end{figure}
+		
+		\begin{figure}[H]
+				    \subfigure[Threshold]{\includegraphics[width=0.4\textwidth ]{media/image-thresh.png}}
+				    \subfigure[Blur]{\includegraphics[width=0.4\textwidth]{media/image-blur.png}}
+				\caption{Die Linke Abbildung zeigt das Ergebnis der Threshold-Funktion welche auf das Differenzbild angewendet wurde. Die Filterung des Threshold-Bilds mit der Blur-Funktion ist auf der rechten Seite dargestellt. Zu Beachten ist das Fehlen der Rauschanteile.}
+				\end{figure}
+			
+		
+		\subsection{Unterschiede Bilddatentypen}
+		Die folgenden Tabellen sollen die Unterschiede der beiden oben erwähnten Datentypen verdeutlichen.
+\begin{table}[H]
+\begin{tabular}{|l|l|l|}
+\hline \rule[-2ex]{0pt}{5.5ex} Name & Inhalt & Basisdatentyp \\ 
+\hline \rule[-2ex]{0pt}{5.5ex} header & Informationen über Frame & std\_messages \\ 
+\hline \rule[-2ex]{0pt}{5.5ex} height & Framehöhe & uint32\\ 
+\hline \rule[-2ex]{0pt}{5.5ex} width & Framebreite & uint32\\  
+\hline \rule[-2ex]{0pt}{5.5ex} encoding & Bildkodierung & String\\  
+\hline \rule[-2ex]{0pt}{5.5ex} is\_bigendian & least significant bit & uint8\\ 
+\hline \rule[-2ex]{0pt}{5.5ex} step & Zeilenlänge in Bytes & uint32\\ 
+\hline \rule[-2ex]{0pt}{5.5ex} data[] & Bildpunkte 2D-Array (step * Zeilenanzahl) & uint8\\ 
+\hline
+\end{tabular}
+\caption{Tabellarische Darstellung des ROS eigenen Datentyps \textit{ImageConstPtr}.} 
+\end{table}
+Der Datentyp des headers std\_messages ist selbst ein synthetischer Datentyp, er kann wiederum Werte der Typen \textit{int, String, double} enthalten.
+\begin{table}[H]
+\begin{tabular}{|l|l|l|}
+\hline Name & Inhalt & Basisdatentyp\\ 
+\hline source & Bildquelle & String\\
+\hline encoding & Bildkodierung & String\\
+\hline image[] & Bildpunkte als 2D-Array $P_i(X/Y)$ & Mat\\
+\hline
+\end{tabular}
+\caption{Tabellarische Darstellung des OpenCV Datentyps \textit{CvImagePtr}.}
+\end{table}
+Der Datentyp Mat ist ein Array des Typs \textit{unsigned int 8}
+ 				 
+		
+\section{Objekte Identifizieren}
+Die herkömmliche Herangehensweise einen Roboter mit visueller Wahrnehmung auszustatten besteht darin, direkt auf dem Chassis des Roboters eine Kamera zu verbauen. Durch die Trennung von Roboter und optischen Sensoren eröffnet sich ein zusätzliches Problem. Da der Roboter sich innerhalb des Bildbereichs bewegen soll wird er zwangsläufig selbst als mobiles Hindernis wahr genommen. Um diesen Fall zu umgehen müssen alle sich bewegenden Elemente des Bilds identifiziert werden. Die grundsätzliceh Aufgabe besteht nun darin die mobile Plattform von Objekten zu unterscheiden. Das Open-Source Projekt \textit{Find\_Object} enthält die hierfür benötigten Funktionen und wurde bereits in die ROS Infrastruktur integriert.
+%\begin{itemize}
+%\item Herkömmliche Herangehensweise Kamera auf dem Roboter
+%\item Durch Trennen der Kamera vom Roboter entsteht ein zusätzliches Problem; Roboter bewegt sich selbst im Bewegungsraum; Wie mache ich dem System bekannt dass %es sich nicht um ein Hindernis sondern um den Roboter selbst handelt.
+%\item darum Lösung zum identifizieren von Objekten benötigt
+%\item findobjekt-2D bietet benötigte Funktionalitäten
+%\item bereits in ROS integriert.
+%\end{itemize}
+
+	\subsection{Identifizieren der mobilen Plattform}
+	Die Identifikation von Objekten mit \textit{find-object} erfolgt durch das Registrieren der gesuchten Objekte. Die Registrierung wird über die GUI durchgeführt. Dazu wird zunächst ein Foto des Objekts angefertigt. Das Programm ermittelt nun Markante Punkte innerhalb des Bildes. Durch das Zuschneiden des Bildes auf die Außenmaße des Objekts, bekommt man ein Template des registrierten Objekts. Das eigentliche Idntifizieren von Objekten innerhalb eines Frames erfolgt durch das abgleichen seiner markanten Punkte mit denen des Objekttemplates.\newline
+	
+	\textbf{(ADD)Bilder von Frame und Objekt(ADD)}\newline
+	
+	Da sich die mobile Plattform innerhalb des Raumes bewegen soll, müssen zum einen perspektivische Unterschiede sowie durch Orientierungsänderungen verursachte Rotationen des Roboters abgefangen werden. Dies geschieht durch das Anfertigen mehrerer Objekttemplates.\newline
+%	\begin{itemize}
+%	\item Robotino identifizieren Alleinstellungsmerkmal
+%	\item Objekt aufnehmen
+%	\item spezielles Muster? QR-Code? Abstraktes deutliches schwarz/weiß Design; durch aufbau Form des Robotino nahezu einzigartig
+%	\item Wie Perspektivische Unterschiede ausgleichen?
+%	\item Roboter von allen Seiten aufnehmen
+%	\item je mehr Bilder desto besser;
+%	\item Prozess mit Screenshots verdeutlichen
+%	\end{itemize}
+	Die Unterscheidung zwischen der mobilen Plattform und eines unbekannten Objekts erfolgt durch die Kombination der Objekt-Erkennung und der Identifikation des Robotino. \textit{Find-Object} bietet die Möglichkeit Informationen über identifizierte Objekte in ein dediziertes ROS Topic zu schreiben. Der Informationsgehalt enthält neben der Objekt-ID die Koordinaten des Objekts innerhalb des Frames. Die Abprüfung erfolgt wiederum über einen eigenen ROS-node. Dieser bezieht sich die Koordinaten der mobilen Plattform vom \textit{objects}-Topic, sowie das Differenzbild des \textit{Image\_Subscriber}-Knotens. Nun vergleicht er die Mittelpunkte der Objekte mit den von \textit{Find-Object} ermittelten Koordinaten des Robotinos. Sollten diese Punkte nicht identisch sein handelt es sich nicht um die mobile Plattform sondern um ein Hindernis. Für die Mittelpunktbestimmung werden die Funktionen \textit{find-contours} und \textit{moments} der OpenCV-library genutzt. 
 	\begin{itemize}
-	\item bezug auf Klassifzierung
-	\item Fallunterscheidung verdeutlichen
-	\item Klassifikation anhand welcher Messwerte/Merkmale
+	\item Wie zwischen Objekt und Robotino unterscheiden?
+	\item \textit{Find-Objects} schreibt die identifizierten Objekte in einem Frame in ein eigenes ROS-Topic, objects.
+	\item Durch eigenen Subscriber node die von Find-Objects ermittelten Koordinaten der Plattform innerhalb des Frames mit den Koordinaten der durch sequential images ermittelte Objekte.
+	\item Dazu Einfärben der Objekte mit floodfill Algorithmus = ideal da Kanten der Objekte bekannt.
+	\item liegen die Koordinaten des Robotinos in weißem Bereich des Frames handelt es sich um den Roboter. Ist dies nicht der Fall befindet sich ein Hindernis im Bewegungsraum des Roboters.
 	\end{itemize}
-	\subsection{Klassifikation}
-	\subsection{Bewegungsanalyse}
-	\subsection{dynamische Objekte}
-			\begin{itemize}
-				\item Stop
-				\item Bewegungsanalyse
-				\item Hindernis kommt direkt auf Roboter zu -> weiterhin stehen bleiben
-				\item Hindernis stoppt und bewegt sich nicht mehr weiter -> Umgehung bestimmen, umfahren
-				\item Hindernis stoppt und bewegt sich weiter -> Roboter bleibt solange stehen bis Hindernis den Bewegungsraum verlassen hat oder sich nicht mehr weiter im Raum bewegt(stillstand) 
-			\end{itemize}
+	
+	\begin{itemize}
+	\item floodfill
+	\item bekommt startpunkt
+	\item prüft benachbarte Punkte auf gemeinsamen Farbwert
+	\item 4er und 8er Nachbarschaft möglich
+	\item Weiterschreiten abhängig von Implementierung
+	\item Stack-variante speichert Koordinaten von Nachbarpunkten in Stapelspeicher, schreitet weiter zum nächsten Pixel per FiLo
+	\item Wenn Nachbar nicht selbe Farbe hat, Kante = Objektgrenze - geht in diese Richtung nicht weiter- Färbt Punkt auch nicht mit definierter Farbe ein.
+	\item Problem besteht darin dass fester Startwert definiert werden muss. Bei dynamischen Objekten nicht anwendbar!
+	\end{itemize}
+	\cite{lode-floodfill}
+	
+	
+	\begin{itemize}
+	\item stattdessen OpenCV funktion findcontours.
+	\item Kann neben Kanten detektieren auch Fläche innerhalb von Kante mit Farbe füllen.
+	\item schneller als floodfill
+	\item ohne Startwert
+	\end{itemize}
+	\cite{cv-findcontours}
+	\cite{cv-floodfill}
+		
+\chapter{Reaktion auf Hindernisse}
+\begin{itemize}
+\item bezug auf Klassifzierung
+\item Fallunterscheidung verdeutlichen
+\item Klassifikation anhand welcher Messwerte/Merkmale
+\end{itemize}
+\subsection{Klassifikation}
+\subsection{Bewegungsanalyse}
+\subsection{dynamische Objekte}
+		\begin{itemize}
+		\item Stop
+		\item Bewegungsanalyse
+		\item Hindernis kommt direkt auf Roboter zu -> weiterhin stehen bleiben
+		\item Hindernis stoppt und bewegt sich nicht mehr weiter -> Umgehung bestimmen, umfahren
+		\item Hindernis stoppt und bewegt sich weiter -> Roboter bleibt solange stehen bis Hindernis den Bewegungsraum verlassen hat oder sich nicht mehr weiter im Raum bewegt(stillstand) 
+		\end{itemize}
 	\subsection{statische Objekte}
 	\subsection{chaotische Objkte}
 	\subsection{Blitz Objekte}
