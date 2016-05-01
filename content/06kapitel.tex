@@ -261,43 +261,107 @@ Die herkömmliche Herangehensweise einen Roboter mit visueller Wahrnehmung auszu
 %	\item Prozess mit Screenshots verdeutlichen
 %	\end{itemize}
 	Die Unterscheidung zwischen der mobilen Plattform und eines unbekannten Objekts erfolgt durch die Kombination der Objekt-Erkennung und der Identifikation des Robotino. \textit{Find-Object} bietet die Möglichkeit Informationen über identifizierte Objekte in ein dediziertes ROS Topic zu schreiben. Der Informationsgehalt enthält neben der Objekt-ID die Koordinaten des Objekts innerhalb des Frames. Die Abprüfung erfolgt wiederum über einen eigenen ROS-node. Dieser bezieht sich die Koordinaten der mobilen Plattform vom \textit{objects}-Topic, sowie das Differenzbild des \textit{Image\_Subscriber}-Knotens. Nun vergleicht er die Mittelpunkte der Objekte mit den von \textit{Find-Object} ermittelten Koordinaten des Robotinos. Sollten diese Punkte nicht identisch sein handelt es sich nicht um die mobile Plattform sondern um ein Hindernis. Für die Mittelpunktbestimmung werden die Funktionen \textit{find-contours} und \textit{moments} der OpenCV-library genutzt. 
-	\begin{itemize}
-	\item Wie zwischen Objekt und Robotino unterscheiden?
-	\item \textit{Find-Objects} schreibt die identifizierten Objekte in einem Frame in ein eigenes ROS-Topic, objects.
-	\item Durch eigenen Subscriber node die von Find-Objects ermittelten Koordinaten der Plattform innerhalb des Frames mit den Koordinaten der durch sequential images ermittelte Objekte.
-	\item Dazu Einfärben der Objekte mit floodfill Algorithmus = ideal da Kanten der Objekte bekannt.
-	\item liegen die Koordinaten des Robotinos in weißem Bereich des Frames handelt es sich um den Roboter. Ist dies nicht der Fall befindet sich ein Hindernis im Bewegungsraum des Roboters.
-	\end{itemize}
+
+%	\begin{itemize}
+%	\item Wie zwischen Objekt und Robotino unterscheiden?
+%	\item \textit{Find-Objects} schreibt die identifizierten Objekte in einem Frame in ein eigenes ROS-Topic, objects.
+%	\item Durch eigenen Subscriber node die von Find-Objects ermittelten Koordinaten der Plattform innerhalb des Frames mit den Koordinaten der durch sequential images ermittelte Objekte.
+%	\item Dazu Einfärben der Objekte mit floodfill Algorithmus = ideal da Kanten der Objekte bekannt.
+%	\item liegen die Koordinaten des Robotinos in weißem Bereich des Frames handelt es sich um den Roboter. Ist dies nicht der Fall befindet sich ein Hindernis im Bewegungsraum des Roboters.
+%	\end{itemize}
+	\subsubsection{floodfill algorithmus}
+	Zuerst war der Lösungsansatz für die Objektkoordinatenbestimmung, die mit dem \textit{Image\_Subscriber}-Node detektierten Objkete mit einer eindeutigen Farbe zu füllen. Im nächsten Schritt wurden zufällig Punkte des Frames welche den definierten Farbwert aufweisen, mit den Koordinaten des Robotinos verglichen. Kommt es zu einer Übereinstimmung handelt es sich bei diesem Objekt um die mobile Plattform selbst. Kommt es zu keiner Übereinstimmung befindet sich ein Störobjekt im Bewegungsraum des Roboters.\\ Für das ausfüllen der Objektflächen eignet sich der Floodfill-Algorithmus. Er arbeitet von einem vorgegebenen Startpunkt aus und vergleicht die Farbwerte der Nachbarpunkte mit denen des Startpunktes. Stimmen die Farbwerte des Referenzpunktes und dessen abgeprüften Nachbar überein färbt er beide Punkte mit einer gemeinsamen Farbe ein. Das Voranschreiten im Frame ist abhängig von der Implementierungsweise. Eine Variante hierfür ist das Nutzen eines Stacks. Hierbei werden alle Koordinaten der geprüften Nachbarn in den Stapelspeicher geschrieben. Wurden alle Nachbarn eines Punktes, 4er und 8er Nachbarschaft möglich, geprüft, wird der oberste Eintrag des Stacks als Startwert der nächsten Iteration benutzt. Trifft der Fall zu dass der Farbwert eines Nachbarn nicht mit der des Referenzpunktes übereinstimmt handelt es sich um eine Kante, welche in unserem Fall die Grenze eines Objekts darstellt. In diesem Fall arbeitet der Algorithmus in dieser Richtung nicht mehr weiter, der Punkt wird wieder aus dem Stack genommen und verworfen. Der Fest definierte Startwert des Algorithmus sorgt dafür dass er für den in diesem Projekt erdachten Zweck nicht nutzbar ist. Wenn der Startwert falsch gewählt wird, werden nicht die Flächen der Objekte gefüllt, sondern die Fläche zwischen Ihnen. Dadurch würden keine Störobjekte im Raum identifiziert werden, was zu Kollisionen zwischen fahrender Plattform und Objekten führen kann.\cite{lode-floodfill}
+%	\begin{itemize}
+%	\item floodfill
+%	\item bekommt startpunkt
+%	\item prüft benachbarte Punkte auf gemeinsamen Farbwert
+%	\item 4er und 8er Nachbarschaft möglich
+%	\item Weiterschreiten abhängig von Implementierung
+%	\item Stack-variante speichert Koordinaten von Nachbarpunkten in Stapelspeicher, schreitet weiter zum nächsten Pixel per FiLo
+%	\item Wenn Nachbar nicht selbe Farbe hat, Kante = Objektgrenze - geht in diese Richtung nicht weiter- Färbt Punkt auch nicht mit definierter Farbe ein.
+%	\item Problem besteht darin dass fester Startwert definiert werden muss. Bei dynamischen Objekten nicht anwendbar!
+%	\end{itemize}
+	
+	\newpage
+	\subsubsection{find\_contours und moments}	
+	Statt der \textit{Floodfill}-Implementierung im OpenCV Paket werden nun die ebenfalls im OpenCV-Paket enthaltenen Funktionen \textit{find\_contours} und \textit{moments} benutzt.
+	
+	\begin{lstlisting}[caption=imageCallbackV2 Funktion des Objekt-Erkennungs nodes, label=imageCallback-V2, title=imageCallback-V2, language=C++]
+	void imageCallback(const sensor_msgs::ImageConstPtr& image)
+	{
+	sensor_msgs::ImageConstPtr imageInRos;
+	imageInRos = image;
+	
+	cv_bridge::CvImagePtr imageInCV = cv_bridge::toCvCopy(imageInRos);
+	
+	Mat matNow = imageInCV->image;
+	
+	
+	if(firstrun == 1){
+	matMinus1 = matNow;
+	firstrun = 0;
+	}
+	
+	///calculate absolute differential and filter noise. Finaly convert to threshold image for improved contrast.
+	absdiff(matMinus1, matNow, imageDiff);
+	matMinus1 = matNow;
+	Mat imageBlur;
+	blur(imageDiff,imageBlur,cv::Size(15,15));
+	Mat imageThresh;
+	threshold( imageBlur, imageThresh, 10, 255,0);
+	
+	///detect edges
+	vector<vector<Point> > contours;
+	vector<Vec4i> hierarchy;
+	findContours( imageThresh, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
+	
+	///join contours to polygons
+	vector<Moments> mu(contours.size() );
+	for( int i = 0; i < contours.size(); i++ )
+	{ mu[i] = moments( contours[i], true ); }
+	
+	///calculate the masscenter of each polygon, used as centralpoint of object
+	vector<Point2f> mc( contours.size() );
+	  for( int i = 0; i < contours.size(); i++ )
+	     { mc[i] = Point2f( mu[i].m10/mu[i].m00 , mu[i].m01/mu[i].m00 ); }
+	
+	///highlight the object-edges and display the masscenter as coloured circle
+	Mat drawing = Mat::zeros( imageBlur.size(), CV_8UC3 );
+	  for( int i = 0; i< contours.size(); i++ )
+	     {
+	       Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
+	       drawContours( drawing, contours, i, color, 2, 8, hierarchy, 0, Point() );
+	       circle( drawing, mc[i], 4, color, -1, 8, 0 );
+	     }
+	
+	imshow( "view_contour", drawing );
+	imshow("view_mono", matNow);
+	imshow("view_diff", imageDiff);
+	imshow("view_thresh", imageThresh);
+	imshow("view_blur", imageBlur);
+	}
+	\end{lstlisting}
 	
 	\begin{itemize}
-	\item floodfill
-	\item bekommt startpunkt
-	\item prüft benachbarte Punkte auf gemeinsamen Farbwert
-	\item 4er und 8er Nachbarschaft möglich
-	\item Weiterschreiten abhängig von Implementierung
-	\item Stack-variante speichert Koordinaten von Nachbarpunkten in Stapelspeicher, schreitet weiter zum nächsten Pixel per FiLo
-	\item Wenn Nachbar nicht selbe Farbe hat, Kante = Objektgrenze - geht in diese Richtung nicht weiter- Färbt Punkt auch nicht mit definierter Farbe ein.
-	\item Problem besteht darin dass fester Startwert definiert werden muss. Bei dynamischen Objekten nicht anwendbar!
-	\end{itemize}
-	\cite{lode-floodfill}
-	
-	
-	\begin{itemize}
-	\item stattdessen OpenCV funktion findcontours.
-	\item Kann neben Kanten detektieren auch Fläche innerhalb von Kante mit Farbe füllen.
-	\item schneller als floodfill
-	\item ohne Startwert
+	\item Zeilen 17, 18, 19: Das Weichzeichnen durch \textit{blur();} wurde vor die Schwellwert-Operation gezogen. hierdurch wird ein besseres Rauschfiltern erreicht.
+	\item Block ab Zeile 24: \textit{findcontours} detektiert die Kanten im übergeben Threshold-Bild. Die gefunden Kanten werden in einem Vector-Array gespeichert.
+	\item Block ab Zeile 29: Hier werden die detektierten Kanten mittles \textit{moments} zu Polygonen zusammengefügt.
+	\item Block ab Zeile 34: Für jedes Polygon wird nun das Massezentrum berechnet, welches als Zentralpunkt des Objekts verwendet wird.
 	\end{itemize}
 	\cite{cv-findcontours}
-	\cite{cv-floodfill}
 		
 \chapter{Reaktion auf Hindernisse}
+
 \begin{itemize}
-\item bezug auf Klassifzierung
-\item Fallunterscheidung verdeutlichen
-\item Klassifikation anhand welcher Messwerte/Merkmale
+
+
+
 \end{itemize}
 \subsection{Klassifikation}
+\begin{itemize}
+\item Klassifikation anhand welcher Messwerte/Merkmale
+\item Fallunterscheidung verdeutlichen
+\end{itemize}
 \subsection{Bewegungsanalyse}
 \subsection{dynamische Objekte}
 		\begin{itemize}
@@ -309,4 +373,4 @@ Die herkömmliche Herangehensweise einen Roboter mit visueller Wahrnehmung auszu
 		\end{itemize}
 	\subsection{statische Objekte}
 	\subsection{chaotische Objkte}
-	\subsection{Blitz Objekte}
+	\subsection{periphere Objekte}
