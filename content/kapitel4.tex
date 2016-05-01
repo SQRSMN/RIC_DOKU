@@ -1,0 +1,46 @@
+%!TEX root = ../dokumentation.tex
+\chapter{Vorarbeiten}
+	\section{Installation der ROS Umgebung}
+	ROS ist offiziell nur für Ubuntu GNU/Linux released. Installation über zusätzliche Paketquellen. Benutzt wird release indigo vorletzte version. Schnittmenge zwischen aktuell und größte Paketunterstützung.
+	\section{Installation der Pakete zur Nutzung des Microsoft Kinect Sensors}
+		\subsection{Treiber}
+		Libfreenect - freier Treiber für die Microsoft Kinect v1
+		bereits Teil des ros-indigo-desktop-full Installationspakets
+	\section{Bilder von Kinect bekommen}
+		\subsection{Ansprechen innerhalb von ROS}
+		freenect\_launch =  integration von libfreenect in ROS System. stellt topics für alle Bildformate der Kinect
+			\subsubsection{Kurzübersicht der freenect\_launch Topics}
+			\begin{itemize}
+			\item \textbf{/camera/depth/image}: 13Bit Graustufenbild
+			\item \textbf{/camera/depth\_registered/image}: 13Bit Graustufenbild, allerdings mit einem Offset um den Versatz von 2,5 cm zwischen dem RGB und Tiefensensor auszugleichen. Somit sieht es aus als hätte die RGB-Kamera das Tiefenbild aufgenommen.
+			\item \textbf{/camera/rgb/image\_color}: Gibt ein 24Bit RGB-Bild aus.
+			\end{itemize}
+	\section{OpenCV}
+		\subsection{Installation}
+			\begin{itemize}
+			\item Version 2.4.11 -> letzte Stabile V2.4 Release
+			\item Build from Source
+			\item cMake
+			\item Auswahl der enthaltenen Module für Makefile
+			\item make danach sudo make install
+			\item anschließend vision\_opencv über paketquellen installieren - cvbridge - konvertieren von ros in cv Bilddatentypen
+			\end{itemize}
+	\section{Robotino}
+		\subsection{robotino api2}
+		\begin{itemize}
+		\item robotino api2
+		\item eintrag in sources list
+		\item apt-get update / install robotino-api2
+		\end{itemize}
+		\subsection{robotino\_pkg}
+		\begin{itemize}
+		\item catkin workspace bauen
+		\item apt-get install ros-indigo-navigation
+		\item packet in catkin\_ws/src
+		\item robotino\_node/CMakelists.txt/include\_directories -> /usr/local/robotino/api2
+		\item catkin\_ws -> catkin\_make
+		\item catkin\_make install
+		\item source ~/catkin\_ws/devel/setup.bash
+		\end{itemize}
+		
+		

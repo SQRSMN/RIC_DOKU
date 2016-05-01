@@ -76,9 +76,23 @@
 			
 %			\subsubsection{Infrarotbilder}
 %			\subsubsection{Pointclouds}
-	\section{OpenCV}
+
 	\section{Robot Operating System}
-		\subsection{basics}
-		\subsection{Topics \& Nodes}
-	\section{Robstep}
+	Das Akronym ROS steht für Robot Operating System. ROS ist kein wirkliches Betriebssystem auch wenn es einige Aufgaben eines OS übernimmt. Beispielsweise übernimmt es die Abstraktion von Hardware. Zusätzlich fungiert ROS wie eine Laufzeitumgebung. Es können Programme in verschiedenen Programmiersprachen wie C++, Python oder Lisp geschrieben werden. Diese Programme können die Infrastrukutur des ROS-Systems für eigene Zwecke nutzen.
+%		\begin{itemize}
+%		\item Robot Operating System
+%		\item Nur pseudo OS erledigt aufgaben wie hardware abstraction, low-level device control
+%		\item Auch Laufzeitumgebung
+%		\end{itemize}
+		\subsection{Kommunikation}
+		ROS übernimmt auch aufgaben hinsichtlich der Kommunikation von Geräten und Prozessen. Dies geschieht über eine P2P-artige Struktur. Das ROS-System besteht aus unterschiedlichen Knoten, auch nodes genannt. Jeder Knoten ist prinzipiell ein executable, eine ausführbare Datei die genau einen Zweck erfüllt. Der zentrale node \textit{roscore} übernimmt die Steuerung des Systems indem er einen BUS bereitstellt über den nodes miteinander kommunizieren können. Dies geschieht durch so genannte Topics. Topics können als Schlagworte aufgefasst werden. Sie werden zu beginn dem Master (roscore-node) bekannt gegeben. Nodes können auf einem Topic lauschen oder darauf senden. Über Topics wird somit die Prozesskommunkation realisiert. 
+%		\begin{itemize}
+%		\item Arbeitet auf Peer-2-Peer Basis
+%		\item hat zentralen Knoten, roscore, steuert alles
+%		\item Prozesskommunikation per message-system
+%		\item messages werden über topics ausgetauscht ähnelt vom Prinzip her einem event-bus
+%		\item Ein ROS System kann sich über mehrere Rechner ausdehnen
+%		\end{itemize}
+		\subsection{ROS Schema}
+		
 	\section{Robotino}
