@@ -248,9 +248,25 @@ Die herkömmliche Herangehensweise einen Roboter mit visueller Wahrnehmung auszu
 	\subsection{Identifizieren der mobilen Plattform}
 	Die Identifikation von Objekten mit \textit{find-object} erfolgt durch das Registrieren der gesuchten Objekte. Die Registrierung wird über die GUI durchgeführt. Dazu wird zunächst ein Foto des Objekts angefertigt. Das Programm ermittelt nun Markante Punkte innerhalb des Bildes. Durch das Zuschneiden des Bildes auf die Außenmaße des Objekts, bekommt man ein Template des registrierten Objekts. Das eigentliche Idntifizieren von Objekten innerhalb eines Frames erfolgt durch das abgleichen seiner markanten Punkte mit denen des Objekttemplates.\newline
 	
-	\textbf{(ADD)Bilder von Frame und Objekt(ADD)}\newline
-	
+	\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\linewidth]{../media/add-object-2}
+	\caption[template-addobject]{Darstellung der Templateerstellung mit Find-Object}
+	\label{fig:add-object-2}
+	\end{figure}
+
 	Da sich die mobile Plattform innerhalb des Raumes bewegen soll, müssen zum einen perspektivische Unterschiede sowie durch Orientierungsänderungen verursachte Rotationen des Roboters abgefangen werden. Dies geschieht durch das Anfertigen mehrerer Objekttemplates.\newline
+	
+		\begin{figure}
+		\centering
+		\includegraphics[width=0.7\linewidth]{../media/fo-robo-3}
+		\caption{Hier wurde der Robotino durch 2 Templates identifiziert. Das Anwenden von mehreren Templates gleichzeitig erhöht die Fehlerresistenz.}
+		\includegraphics[width=0.7\linewidth]{../media/fo-robotino-1}
+		\caption{Hier wurde der Robotino durch 1 Template identifiziert.}
+		\label{fig:fo-robo-3}
+		\end{figure}
+
+	
 %	\begin{itemize}
 %	\item Robotino identifizieren Alleinstellungsmerkmal
 %	\item Objekt aufnehmen

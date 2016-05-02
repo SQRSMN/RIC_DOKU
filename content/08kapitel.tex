@@ -1,23 +1,119 @@
 %!TEX root = ../dokumentation.tex
 \chapter{Interaktion mit mobiler Plattform}
 	\section{Plattformwechsel}
-	\begin{itemize}
-	\item Robstep
-	\item warum weg von Robstep
-	\item warum eignet sich der Robotino besser?
-	\end{itemize}
+	Das Ziel war es eine Infrastruktur zur autonomisierung der mobilen Plattform Robstep zu implementieren. Jedoch wurde dies durch technische Einschränkungen seitens des Robsteps verhindert. Für die Kommunikation öffnet der Robstep ein eigenes WLAN. Jedoch kann sich jeweils nur 1 Gerät mit diesem Netz verbinden. Da die Bewegung der mobilen Plattform über einen externen Rechner abgesetzt werden, besteht keine Möglichkeit eine direkte Verbindung mit dem ROS aufzubauen. Stattdessen wurde ein Plattformwechsel zu einem Robotino durchgeführt. Dieser Roboter öffnet ebenfalls ein eigenes WLAN, erlaubt aber das gleichzeitige Verbinden mehrerer Geräte. Zusätzlich wurden für den Robotino bereits Pakete in ROS bereitgestellt, was die Implementierung von Bewegungsbefehlen erübrigt.
+
 	\section{Kommunikation mit mobiler Plattform}
+	Die Kommunikation zwischen ROS-nodes und Robotino verläuft innerhalb des ROS-Systems. Im Robotino ist ein eigener Rechner verbaut, auf dem ein ROS-Knoten zur Ansteuerung von Sensoren und des Fahrsystems betrieben wird.
 		\subsection{Integration des Robotino in ROS}
-		\subsection{Analyse der Topics und Nodes}
-			\begin{itemize}
-			\item robotino\_node
-			\item robotino\_local\_movement
-			\item rosrun robotino\_local\_move robotino\_local\_move\_client\_node x, y, Rotation in Grad, Timeout in Sekunden
-			\item Befehl zum Unterbrechen von Befehlen und sofortiges Anhalten.
-			\end{itemize}
-		\subsection{Konzeption der Kommunikation}
-			\subsubsection{nötige Funktionen}
-			\subsubsection{mögliche Befehle \& erwartetes Verhalten}
-			\subsubsection{Visualisierung des Kommunikationsprozesses}
-	\section{Abbilden der Steuerbefehle auf Anweisungen des Eventhandlers}
+		Die Kommunikation mit der mobilen Plattform wird auf einem Rechner mit physikalischer Trennung zum Roboter initiiert. Dazu werden die folgenden Knoten und Dienste des ROS-Pakets benutzt.
+		\subsubsection{robotino\_node}
+		Der robotino\_node wird auf dem Clientsystem installiert. Er initiiert die Verbindung zum lokalen ROS-Knoten auf der mobilen Plattform. Er stellt wiederum Topics bereit über die indirekt mit dem lokalen Hardware-Knoten des Robotinos gesprochen werden kann.
+		\subsubsection{robotino\_local\_movement\_server}
+		Der robotino\_local\_movement\_server ist Teil des Robotino Pakets \textit{robotino\_local\_movement}. Er stellt eine Verbindung zum \textit{robotino\_node} her in dem er Steuerungsbefehle empfängt und sie an das entsprechende Topic des \textit{robotino\_node} sendet.
+		\subsubsection{robotino\_local\_move\_client\_node}
+		Mit diesem node werden Steuerungsbefehle an den local-move-server gesendet. Jeder Befehl umfasst genau eine Bewegung welche aus 4 Teilen zusammengesetzt wird. Translation auf X-Achse; Translation auf Y-Achse; Rotation in Grad, Timeout des Befehls in Sekunden(Ist der Befehl innerhalb des Timeouts nicht erledigt wird er trotzdem beendet). Die Translationen sind jeweils in Metern angegeben.
+%		\begin{itemize}
+%		\item Kurzer überblick über Nodes und Topics
+%		\item robotino\_node -> Baut verbindung zum Robotino-Hardware Knoten auf
+%		\item robotino\_local\_movement\_server lokaler Service der Bewegungs-Befehle empfängt und an den robotino\_node weitergibt
+%		\item robotino\_local\_move\_client\_node Node um Befehle an den local-movement-server zu senden. Message hat das Format Translation auf X-Achse; Translation auf Y-Achse; Rotation in Grad, Timeout des Befehls in Sekunden(Ist der Befehl innerhalb des Timeouts nicht erledigt wird er trotzdem beendet)
+%		\item Schema 
+%		\end{itemize}
+
+	\section{Eventhandling}
+	Der eventhandler soll als Brücke zwischen Objekterkennung und Robotino arbeiten. Die nodes \textit{image\_subscriber} und \textit{find\_object} publishen daten auf dedizierten Topics. Ein weiterer node lauscht auf beiden Topics, sobald neue Nachrichten anliegen vergleicht er die Koordinaten des Robotinos mit denen der Objektmittelpunkte. Besteht in einem Fall keine Übereinstimmung published er auf den boolschen Wert true auf das Topic /obstacle.\\
+	Der eigentliche eventhandler empfängt Nachrichten des Topcis /obstacle. Sobald er die Nachricht \textit{true} erhält, published er eine Nachricht an das Topic \textit{/cmd\_vel} um den Bewegungsablauf des Robotinos zu unterbrechen.
 	
+	
+
+	\newpage
+	\begin{lstlisting}[language=C++]
+
+	bool obstacle_detected = false;
+	geometry_msgs::Twist msg;
+	
+
+	///get obstacle-state
+	void obstacleCallback(const std_msgs::Bool& obstaclemsg)
+	{
+	  obstacle_detected = obstaclemsg;
+	}
+	
+	int main(int argc, char **argv)
+	{
+	  ros::init(argc, argv, "listener");
+	
+	  ros::NodeHandle n;
+	
+      ///init subscriber to receive obstacle-messages
+	  ros::Subscriber sub = n.subscribe("\obstacle", 10, obstacleCallback);
+	
+	  ///init publisher to push stop-command to Robotino
+	  ros::Publisher cmd_vel_pub_ = n.advertise<geometry_msgs::Twist>("/cmd_vel", 1, true);
+	
+	///keep checking if obstacles are found. if true -> publish stop message
+	while (ros::ok())
+		{
+		if(obstacle_detected == true){
+			msg.linear.x = 0;
+			msg.linear.y = 0;
+			msg.angular.z = 0;
+			cmd_vel_pub_.publish(msg);}
+			ros::spinOnce();
+	
+		}
+		return 0;
+	}
+
+	\end{lstlisting}
+	
+	\begin{itemize}
+	\item Block ab Zeile 6: Topic \textit{/obstacles} nach neuen Nachrichten abfragen.
+	\item Block ab Zeile 25: Hier wird, sofern über das Topic \textit{/obstacles} eine Nachricht mit dem boolschen Wert true vorliegt, eine Nachricht an das \textit{/cmd\_vel}-Topic verschickt.
+	\end{itemize}
+	 Diese Nachricht setzt sich aus einer X-Achsen und Y-Achsen Translation und einer Rotation zusammen. Alle 3 Werte sind auf 0 gesetzt. Dies überschreibt den aktuellen Bewegungsauftrag des Robotino mit den Werten 0. Dadurch ist sichergestellt dass die mobile Plattform bei detektierten Störobjekten anhält.
+	 
+	 Um über den Seperation-Node die Koordinaten der Objektmittelpunkte mit denen des Robotinos zu vergleichen muss zunächst der Image-Subscriber node erweitert werden. Hierfür wird ein publisher eingefügt, der die berechneten Objektmittelpunkte über das Topic \textit{(objectsXY)} verteilt.
+	 \begin{lstlisting}[language = C++]	 
+	 ros::Publisher objectCenter = n.advertise<std_messages::Float32MultiArray>("/objectsXY", 1, true);
+ 	 \end{lstlisting}
+	 Diese Publisher Deklaration wird in die Main-Methode des image-subscriber nodes eingefügt
+	 
+	 
+	\begin{lstlisting}[language = C++]
+	float msg[2] = 0.0, 0.0;
+	for(i=0, i<2, i++ ){
+	msg[i] = mc[i];
+	}
+	objectCenter.publish(msg);
+	\end{lstlisting}
+	Hierüber werden die Koordinaten des Objektzentrums in ein fließkomma-Array geschrieben und über eine 32-Bit Floatmessage gepublished. Die Konvertierung ist notwendig, da es keine direkte Message für Vector-Elemente gibt.
+	
+	\begin{lstlisting}[language = C++]
+	void objectCenter_callback(const std_msgs::Float32MultiArray& objCenterFloat){
+	
+		for(i=0, i<2, i++){
+		objectCenterXY[i] = objCenterFloat[i];}
+	}
+	
+	void robotinoCenter_callback(const std_msgs::Float32MultiArray& roboCenterFloat){
+	
+		for(i=0, i<2, i++){
+		robotinoCenterXY[i] = roboCenterFloat[i];}
+	}
+	\end{lstlisting}
+	Durch die Callback-Funktionen werden jeweils die Koordinaten der Mittelpunkte des Robotinos sowie des Objekts in lokale float-Arrays geschrieben.
+	
+	
+	\begin{lstlisting}[language=C++]
+		for(i=0, i<2, i++){
+		if(objectCenterXY[i] != robotinoCenterXY[i]){
+		msg = true;
+	    obstacleBool.publish(msg);
+		}}
+
+	\end{lstlisting}
+	Der Koordinatenabgleich wird durch eine Konditionalabfrage innerhalb einer for-Schleife durchgeführt. Wenn einer der Werte nicht mit denen des Robotino übereinstimmt wird dies über den Wechsel von false auf true in der boolschen Variable msg signalisiert. Anschließend wird der aktualisierte Wert auf das Topic \textit{/obstacle} gepublished.
+
+	 
