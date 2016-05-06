@@ -74,24 +74,46 @@
 %			\end{itemize}
 
 			
-%			\subsubsection{Infrarotbilder}
-%			\subsubsection{Pointclouds}
 
 	\section{Robot Operating System}
-	Das Akronym ROS steht für Robot Operating System. ROS ist kein wirkliches Betriebssystem auch wenn es einige Aufgaben eines OS übernimmt. Beispielsweise übernimmt es die Abstraktion von Hardware. Zusätzlich fungiert ROS wie eine Laufzeitumgebung. Es können Programme in verschiedenen Programmiersprachen wie C++, Python oder Lisp geschrieben werden. Diese Programme können die Infrastrukutur des ROS-Systems für eigene Zwecke nutzen.
+	Das Akronym ROS steht für Robot Operating System. ROS ist kein wirkliches Betriebssystem auch wenn es einige Aufgaben eines OS übernimmt. Beispielsweise übernimmt es die Abstraktion von Hardware. Zusätzlich fungiert ROS wie eine Laufzeitumgebung. Es können Programme in verschiedenen Programmiersprachen wie C++, Python oder Lisp geschrieben werden. Diese Programme können die Infrastrukutur des ROS-Systems für eigene Zwecke nutzen, erweitern das System gleichzeitig auch um dessen implementierte Funktionalität. Dies geschieht über das Message System von ROS.
+		\subsection{topics}
+		Die Kommunikation innerhalb des ROS-Systems erfolgt über eine peer2peer-artige Struktur. Dies erfolgt über einen eigenen Bus für jedes Thema, im ROS-System \textit{topic} genannt. Die \textit{topics} dienen gleichzeitig als Schlagwort für die Kommunikation. Die Kommunikation über \textit{topics} findet zwischen \textit{publisher} und \textit{subscriber} statt. Dabei meldet der publisher dem zentralen Knoten des ROS-Systems dass Nachrichten über ein bestimmtes \textit{topic} ausgetauscht werden müssen. Nun können andere Publisher Nachrichten mit dem Namen des Topics als \textit{Betreff} auf den betreffenden Bus senden. Knoten für welche die Nachrichten auf dem BUS von interesse sind, melden sich als Subscriber am Bus an, und bekommen eine Benachrichtigung sobald eine neue Nachricht auf dem Bus liegt. Die Nachrichten im ROS-System als \textit{messages} bezeichnet, haben einen fest definierten Inhalt. Die Definition eigener Nachrichtentypen ist ebenfalls möglich sowie das Nutzen vorbereiteter Nachrichten. Üblicherweise verfügt jedes Paket über eigene angepasste Nachrichtentypen. Ein Beispiel über den Aufbau einer ROS-\textit{message} wird im Kapitel \textit{Hindernisse} unter dem Abschnitt \textit{Unterschiede Bilddatentypen} aufgeführt.
 %		\begin{itemize}
-%		\item Robot Operating System
-%		\item Nur pseudo OS erledigt aufgaben wie hardware abstraction, low-level device control
-%		\item Auch Laufzeitumgebung
+%		\item Kommunikation in ROS über p2p-artige Struktur.
+%		\item ein zentraler Kommunikationsbus für jedes \"Thema\" -> Topic.
+%		\item dienen Gleichzeitig als Schlagwort für Kommunikation
+%		\item publisher/subscriber Verfahren
+%		\item initialer publisher meldet an zentralem Knoten dass Nachrichten über bestimmtes Topic ausgetauscht werden müssen.
+%		\item Nun können andere Publisher Nachrichten mit dem Namen des Topics als \textit{Betreff} auf den betreffenden Bus senden.
+%		\item Knoten für welche die Nachrichten auf dem BUS von interesse sind, melden sich als Subscriber am Bus an, und bekommen eine Benachrichtigung sobald eine neue Nachricht auf dem Bus liegt.
+%		\item Die Nachrichten im ROS-System als \textit{messages} bezeichnet, haben einen fest definierten Inhalt. Die Definition eigener Nachrichtentypen ist ebenfalls möglich wie das nutzen vorbereiteter Nachrichten. Üblicherweise verfügt jedes Packet über eigene angepasste Nachrichtentypen. Ein Beispiel über den Aufbau einer ROS-message wird im Kapitel \textit{Hindernisse} unter dem Abschnitt \textit{Unterschiede Bilddatentypen} aufgeführt.
 %		\end{itemize}
-		\subsection{Kommunikation}
-		ROS übernimmt auch aufgaben hinsichtlich der Kommunikation von Geräten und Prozessen. Dies geschieht über eine P2P-artige Struktur. Das ROS-System besteht aus unterschiedlichen Knoten, auch nodes genannt. Jeder Knoten ist prinzipiell ein executable, eine ausführbare Datei die genau einen Zweck erfüllt. Der zentrale node \textit{roscore} übernimmt die Steuerung des Systems indem er einen BUS bereitstellt über den nodes miteinander kommunizieren können. Dies geschieht durch so genannte Topics. Topics können als Schlagworte aufgefasst werden. Sie werden zu beginn dem Master (roscore-node) bekannt gegeben. Nodes können auf einem Topic lauschen oder darauf senden. Über Topics wird somit die Prozesskommunkation realisiert. 
+		\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.7\linewidth]{../media/rqt-graph}
+		\caption{Überblick über die Topics sowie Subscriber/Publisher Nodes eines ROS-Systems.}
+		\label{fig:rqt-graph}
+		\end{figure}
+
+		\subsection{nodes}
+		Knoten bzw \textit{nodes} sind ausführbare Programmdateien welche Aufgauben im ROS-System übernehmen. Sie erfüllen in der Regel genau einen Zweck, was dem modularen Aufbau des ROS-Systems zuspielt. Die zentrale Funktionalität wird über den ROS-Master gereitgestellt. Er stellt auch die Kommunikationsbusse für \textit{topics} bereit.
 %		\begin{itemize}
-%		\item Arbeitet auf Peer-2-Peer Basis
-%		\item hat zentralen Knoten, roscore, steuert alles
-%		\item Prozesskommunikation per message-system
-%		\item messages werden über topics ausgetauscht ähnelt vom Prinzip her einem event-bus
-%		\item Ein ROS System kann sich über mehrere Rechner ausdehnen
+%		\item Nodes bzw. Knoten sind ausführbare Programmdateien welche Aufgaben im ROS-System übernehmen.
+%		\item Sie erfüllen in der Regel genau einen zweck, was dem modularen Aufbau des ROS-Systems zuspielt.
+%		\item Die zentrale Funktionalität wird über den ROS-Master bereitgestellt.
+%		\item stellt Buse für die Kommunikation über Topics bereit.
 %		\end{itemize}
-		\subsection{ROS Schema}
+		\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.7\linewidth]{../media/pub_sub-1}
+		\caption{Initialer Publisher, sendet an Master dass er auf Topic T1 publishen will. Master erstellt darauf den Topic T1.}
+		\label{fig:pub_sub-1}
+		\end{figure}
+		\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.7\linewidth]{../media/pub_sub-2}
+		\caption{Publisher sendet \textit{bla} an Topic T1, Subscriber liest von T1.}
+		\label{fig:pub_sub-2}
+		\end{figure}
 		

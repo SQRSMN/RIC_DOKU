@@ -1,5 +1,5 @@
 %!TEX root = ../dokumentation.tex
-\chapter{Interaktion mit mobiler Plattform}
+\chapter{Interaktion mit mobiler Plattform hinsichtlich Hindernissen}
 	\section{Plattformwechsel}
 	Das Ziel war es eine Infrastruktur zur autonomisierung der mobilen Plattform Robstep zu implementieren. Jedoch wurde dies durch technische Einschränkungen seitens des Robsteps verhindert. Für die Kommunikation öffnet der Robstep ein eigenes WLAN. Jedoch kann sich jeweils nur 1 Gerät mit diesem Netz verbinden. Da die Bewegung der mobilen Plattform über einen externen Rechner abgesetzt werden, besteht keine Möglichkeit eine direkte Verbindung mit dem ROS aufzubauen. Stattdessen wurde ein Plattformwechsel zu einem Robotino durchgeführt. Dieser Roboter öffnet ebenfalls ein eigenes WLAN, erlaubt aber das gleichzeitige Verbinden mehrerer Geräte. Zusätzlich wurden für den Robotino bereits Pakete in ROS bereitgestellt, was die Implementierung von Bewegungsbefehlen erübrigt.
 
@@ -110,8 +110,7 @@
 		for(i=0, i<2, i++){
 		if(objectCenterXY[i] != robotinoCenterXY[i]){
 		msg = true;
-	    obstacleBool.publish(msg);
-		}}
+	    obstacleBool.publish(msg);}}
 
 	\end{lstlisting}
 	Der Koordinatenabgleich wird durch eine Konditionalabfrage innerhalb einer for-Schleife durchgeführt. Wenn einer der Werte nicht mit denen des Robotino übereinstimmt wird dies über den Wechsel von false auf true in der boolschen Variable msg signalisiert. Anschließend wird der aktualisierte Wert auf das Topic \textit{/obstacle} gepublished.

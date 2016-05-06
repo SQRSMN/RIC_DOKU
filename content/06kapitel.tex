@@ -47,7 +47,18 @@
 		Eine Variante lautet \textit{sequential images}, dt. \textit{auf einander folgende Bilder}. Dabei wird eine Folge von Bildern, im Regelfall zwei $f_i$ \& $f_i+1$, im gesamten verglichen. Eine Möglichkeit dies zu tun besteht darin für jeden Pixel $p_xy$ der beiden Bilder die Differenz der Grauwerte zu erzeugen. Grauwerte deshalb da \textit{sequential images} monochrome bzw. Graufstufenbilder als Eingabe erfordern. Graustufenbilder eignen sich hierfür im Gegensatz zu Farbbildern aufgrund der Beschränkung auf 2 Maxima, schwarz und weiß, mit $n$ vielen (grauen) Zwischenwerten. Dadurch laesst sich die Differenz durch eine simple Subtraktion der Grauwerte erreichen. Das RGB Farbmodell hingegen verfügt über 8 Maxima, von denen 6 Maxima jeweils über eine Komplementärefarbe innerhalb des Farbmodells verfügen. Dies erschwert die Differenzbildung da nur in bestimmten Fällen durch eine Subtraktion der vorhandene Farbwert neutralisiert wird. Stattdessen würde man in vielen Fällen lediglich einen anderen Farbwert erhalten. Das Ziel der Differenzbildung besteht jedoch darin die gemeinsamen Merkmale die in beiden aufeinander folgenden Bildern auftauchen zu entfernen, und nur die einzigartigen Merkmale des nachfolgenden Bildes zu bewahren.\\
 		Sind die Grauwerte $g_p(f_i)$, $g_p(f_i+1)$ von Pixel $p_xy$ in $f_i$ und $f_i+1$ identisch wird der Wert für diesen Pixel auf 0 (schwarz) gesetzt. Dabei handelt es sich um den Idealfall. In der reellen Anwendung dieses Verfahrens werden die Werte nur stark reduziert da durch die Dynamik der Lichtverhältnisse die Grauwerte des Pixels zwar nur marginal dafür allerdings konstant schwanken und dadurch die Wahrscheinlichkeit für das Eintreffen des Idealfalls $g_p(f_i)$ = $g_p(f_i+1)$ nur sehr gering ist.
 		
-		\textbf{(ADD)referenz und differenzbild(ADD)}
+		\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.7\linewidth]{../media/image-mono}
+		\caption{Ausgangsbild in monochromatischer Form.}
+		\label{fig:image-mono}
+		\end{figure}
+		\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.7\linewidth]{../media/image-blur}
+		\caption{Gefiltertes Differenzbild erzeugt aus dem Referenzbild $f_i$ und dem Nachfolger $f_i+1$.}
+		\label{fig:image-diff}
+		\end{figure}
 		
 %		\begin{itemize}
 %		\item Graustufenbild, monochrom
@@ -154,7 +165,7 @@
 %		\item abprüfen ob Frame weiße Elemente enthält
 %		\item publish stop auf robotino-handler
 %		\end{itemize}
-		\textbf{(ADD)PAP und Codeschnipsel(ADD)}
+
 		\newpage
 		\begin{lstlisting}[caption=imageCallbackV2 Funktion des Objekt-Erkennungs nodes, label=imageCallback-V2, title=imageCallback-V2, language=C++]
 		void imageCallback(const sensor_msgs::ImageConstPtr& image)
