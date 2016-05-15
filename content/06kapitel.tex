@@ -243,7 +243,7 @@ Der Datentyp des headers std\_messages ist selbst ein synthetischer Datentyp, er
 \end{tabular}
 \caption{Tabellarische Darstellung des OpenCV Datentyps \textit{CvImagePtr}.}
 \end{table}
-Der Datentyp Mat ist ein Array des Typs \textit{unsigned int 8}
+Der Datentyp Mat ist ein Array des Typs \textit{unsigned int 8}.
  				 
 		
 \section{Objekte Identifizieren}
@@ -257,7 +257,7 @@ Die herkömmliche Herangehensweise einen Roboter mit visueller Wahrnehmung auszu
 %\end{itemize}
 
 	\subsection{Identifizieren der mobilen Plattform}
-	Die Identifikation von Objekten mit \textit{find-object} erfolgt durch das Registrieren der gesuchten Objekte. Die Registrierung wird über die GUI durchgeführt. Dazu wird zunächst ein Foto des Objekts angefertigt. Das Programm ermittelt nun Markante Punkte innerhalb des Bildes. Durch das Zuschneiden des Bildes auf die Außenmaße des Objekts, bekommt man ein Template des registrierten Objekts. Das eigentliche Idntifizieren von Objekten innerhalb eines Frames erfolgt durch das abgleichen seiner markanten Punkte mit denen des Objekttemplates.\newline
+	Die Identifikation von Objekten mit \textit{find-object} erfolgt durch das Registrieren der gesuchten Objekte. Die Registrierung wird über die GUI durchgeführt. Dazu wird zunächst ein Foto des Objekts angefertigt. Das Programm ermittelt nun Markante Punkte innerhalb des Bildes. Durch das Zuschneiden des Bildes auf die Außenmaße des Objekts, bekommt man ein Template des registrierten Objekts. Das eigentliche Identifizieren von Objekten innerhalb eines Frames erfolgt durch das abgleichen seiner markanten Punkte mit denen des Objekttemplates.\newline \cite{find-object-ros} \cite{find-object}
 	
 	\begin{figure}[H]
 	\centering
@@ -281,13 +281,13 @@ Die herkömmliche Herangehensweise einen Roboter mit visueller Wahrnehmung auszu
 %	\begin{itemize}
 %	\item Robotino identifizieren Alleinstellungsmerkmal
 %	\item Objekt aufnehmen
-%	\item spezielles Muster? QR-Code? Abstraktes deutliches schwarz/weiß Design; durch aufbau Form des Robotino nahezu einzigartig
+%	\item spezielles Muster? QR-Code? Abstraktes deutliches schwarz/weiß Design; durch Aufbau Form des Robotino nahezu einzigartig
 %	\item Wie Perspektivische Unterschiede ausgleichen?
 %	\item Roboter von allen Seiten aufnehmen
 %	\item je mehr Bilder desto besser;
 %	\item Prozess mit Screenshots verdeutlichen
 %	\end{itemize}
-	Die Unterscheidung zwischen der mobilen Plattform und eines unbekannten Objekts erfolgt durch die Kombination der Objekt-Erkennung und der Identifikation des Robotino. \textit{Find-Object} bietet die Möglichkeit Informationen über identifizierte Objekte in ein dediziertes ROS Topic zu schreiben. Der Informationsgehalt enthält neben der Objekt-ID die Koordinaten des Objekts innerhalb des Frames. Die Abprüfung erfolgt wiederum über einen eigenen ROS-node. Dieser bezieht sich die Koordinaten der mobilen Plattform vom \textit{objects}-Topic, sowie das Differenzbild des \textit{Image\_Subscriber}-Knotens. Nun vergleicht er die Mittelpunkte der Objekte mit den von \textit{Find-Object} ermittelten Koordinaten des Robotinos. Sollten diese Punkte nicht identisch sein handelt es sich nicht um die mobile Plattform sondern um ein Hindernis. Für die Mittelpunktbestimmung werden die Funktionen \textit{find-contours} und \textit{moments} der OpenCV-library genutzt. 
+	Die Unterscheidung zwischen der mobilen Plattform und eines unbekannten Objekts erfolgt durch die Kombination der Objekt-Erkennung und der Identifikation des Robotino. \textit{Find-Object} bietet die Möglichkeit Informationen über identifizierte Objekte in ein dediziertes ROS Topic zu schreiben. Der Informationsgehalt enthält neben der Objekt-ID die Koordinaten des Objekts innerhalb des Frames. Die Prüfung erfolgt wiederum über einen eigenen ROS-node. Dieser bezieht sich die Koordinaten der mobilen Plattform vom \textit{objects}-Topic, sowie das Differenzbild des \textit{Image\_Subscriber}-Knotens. Nun vergleicht er die Mittelpunkte der Objekte mit den von \textit{Find-Object} ermittelten Koordinaten des Robotinos. Sollten diese Punkte nicht identisch sein handelt es sich nicht um die mobile Plattform sondern um ein Hindernis. Für die Mittelpunktbestimmung werden die Funktionen \textit{find-contours} und \textit{moments} der OpenCV-library genutzt. 
 
 %	\begin{itemize}
 %	\item Wie zwischen Objekt und Robotino unterscheiden?
@@ -296,8 +296,8 @@ Die herkömmliche Herangehensweise einen Roboter mit visueller Wahrnehmung auszu
 %	\item Dazu Einfärben der Objekte mit floodfill Algorithmus = ideal da Kanten der Objekte bekannt.
 %	\item liegen die Koordinaten des Robotinos in weißem Bereich des Frames handelt es sich um den Roboter. Ist dies nicht der Fall befindet sich ein Hindernis im Bewegungsraum des Roboters.
 %	\end{itemize}
-	\subsubsection{floodfill algorithmus}
-	Zuerst war der Lösungsansatz für die Objektkoordinatenbestimmung, die mit dem \textit{Image\_Subscriber}-Node detektierten Objkete mit einer eindeutigen Farbe zu füllen. Im nächsten Schritt wurden zufällig Punkte des Frames welche den definierten Farbwert aufweisen, mit den Koordinaten des Robotinos verglichen. Kommt es zu einer Übereinstimmung handelt es sich bei diesem Objekt um die mobile Plattform selbst. Kommt es zu keiner Übereinstimmung befindet sich ein Störobjekt im Bewegungsraum des Roboters.\\ Für das ausfüllen der Objektflächen eignet sich der Floodfill-Algorithmus. Er arbeitet von einem vorgegebenen Startpunkt aus und vergleicht die Farbwerte der Nachbarpunkte mit denen des Startpunktes. Stimmen die Farbwerte des Referenzpunktes und dessen abgeprüften Nachbar überein färbt er beide Punkte mit einer gemeinsamen Farbe ein. Das Voranschreiten im Frame ist abhängig von der Implementierungsweise. Eine Variante hierfür ist das Nutzen eines Stacks. Hierbei werden alle Koordinaten der geprüften Nachbarn in den Stapelspeicher geschrieben. Wurden alle Nachbarn eines Punktes, 4er und 8er Nachbarschaft möglich, geprüft, wird der oberste Eintrag des Stacks als Startwert der nächsten Iteration benutzt. Trifft der Fall zu dass der Farbwert eines Nachbarn nicht mit der des Referenzpunktes übereinstimmt handelt es sich um eine Kante, welche in unserem Fall die Grenze eines Objekts darstellt. In diesem Fall arbeitet der Algorithmus in dieser Richtung nicht mehr weiter, der Punkt wird wieder aus dem Stack genommen und verworfen. Der Fest definierte Startwert des Algorithmus sorgt dafür dass er für den in diesem Projekt erdachten Zweck nicht nutzbar ist. Wenn der Startwert falsch gewählt wird, werden nicht die Flächen der Objekte gefüllt, sondern die Fläche zwischen Ihnen. Dadurch würden keine Störobjekte im Raum identifiziert werden, was zu Kollisionen zwischen fahrender Plattform und Objekten führen kann.\cite{lode-floodfill}
+	\subsubsection{floodfill Algorithmus}
+	Zuerst war der Lösungsansatz für die Objektkoordinatenbestimmung, die mit dem\\ \textit{Image\_Subscriber} Nodes detektierten Objekte mit einer eindeutigen Farbe zu füllen. Im nächsten Schritt wurden zufällig Punkte des Frames welche den definierten Farbwert aufweisen, mit den Koordinaten des Robotinos verglichen. Kommt es zu einer Übereinstimmung handelt es sich bei diesem Objekt um die mobile Plattform selbst. Kommt es zu keiner Übereinstimmung befindet sich ein Störobjekt im Bewegungsraum des Roboters.\\ Für das ausfüllen der Objektflächen eignet sich der Floodfill-Algorithmus. Er arbeitet von einem vorgegebenen Startpunkt aus und vergleicht die Farbwerte der Nachbarpunkte mit denen des Startpunktes. Stimmen die Farbwerte des Referenzpunktes und dessen geprüften Nachbar überein färbt er beide Punkte mit einer gemeinsamen Farbe ein. Das Voranschreiten im Frame ist abhängig von der Implementierungsweise. Eine Variante hierfür ist das Nutzen eines Stacks. Hierbei werden alle Koordinaten der geprüften Nachbarn in den Stapelspeicher geschrieben. Wurden alle Nachbarn eines Punktes, 4er und 8er Nachbarschaft möglich, geprüft, wird der oberste Eintrag des Stacks als Startwert der nächsten Iteration benutzt. Trifft der Fall zu dass der Farbwert eines Nachbarn nicht mit der des Referenzpunktes übereinstimmt handelt es sich um eine Kante, welche in unserem Fall die Grenze eines Objekts darstellt. In diesem Fall arbeitet der Algorithmus in dieser Richtung nicht mehr weiter, der Punkt wird wieder aus dem Stack genommen und verworfen. Der Fest definierte Startwert des Algorithmus sorgt dafür dass er für den in diesem Projekt erdachten Zweck nicht nutzbar ist. Wenn der Startwert falsch gewählt wird, werden nicht die Flächen der Objekte gefüllt, sondern die Fläche zwischen Ihnen. Dadurch würden keine Störobjekte im Raum identifiziert werden, was zu Kollisionen zwischen fahrender Plattform und Objekten führen kann.\newline \cite{lode-floodfill}
 %	\begin{itemize}
 %	\item floodfill
 %	\item bekommt startpunkt
@@ -371,8 +371,8 @@ Die herkömmliche Herangehensweise einen Roboter mit visueller Wahrnehmung auszu
 	
 	\begin{itemize}
 	\item Zeilen 17, 18, 19: Das Weichzeichnen durch \textit{blur();} wurde vor die Schwellwert-Operation gezogen. hierdurch wird ein besseres Rauschfiltern erreicht.
-	\item Block ab Zeile 24: \textit{findcontours} detektiert die Kanten im übergeben Threshold-Bild. Die gefunden Kanten werden in einem Vector-Array gespeichert.
-	\item Block ab Zeile 29: Hier werden die detektierten Kanten mittles \textit{moments} zu Polygonen zusammengefügt.
+	\item Block ab Zeile 24: \textit{findcontours} detektiert die Kanten im übergebenen Threshold-Bild. Die gefundenen Kanten werden in einem Vector-Array gespeichert.
+	\item Block ab Zeile 29: Hier werden die detektierten Kanten mittels \textit{moments} zu Polygonen zusammengefügt.
 	\item Block ab Zeile 34: Für jedes Polygon wird nun das Massezentrum berechnet, welches als Zentralpunkt des Objekts verwendet wird.
 	\end{itemize}
 	\cite{cv-findcontours}

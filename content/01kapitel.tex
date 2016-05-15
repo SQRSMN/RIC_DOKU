@@ -1,119 +1,17 @@
 %!TEX root = ../dokumentation.tex
 
-\chapter{Theorieinhalte}
-	\section{Kinect}
-	Bei der Microsoft Kinect handelt es sich um einen kombinierten Bildsensor für den Consumermarkt. Der von Microsoft \underline{ursprünglich konzipierte} Einsatzzweck ist für die Integration von Gestensteuerung in Videospielen in Kombination mit einer Microsoft Xbox 360 Konsole. Erste Details des Gerätes wurden zunächst noch unter dem Workingtitle Project Natal veröffentlicht. Die Prototypen entstanden in Zusammenarbeit mit PrimeSense. Der sehr günstige Preis, mittlerweile 20 Euro für ein gebrauchtes Gerät, sowie quelloffene Treiber und Libraries machen die Kinect zu einem sehr beliebten Baustein zahlreicher Hobby- und Forschungsprojekten.
-%	\begin{itemize}
-%	\item Codename Projekt Natal
-%	\item PrimeSense hat Prototyp entwickelt im Auftrag von Microsoft
-%	\item Gedacht für Gestensteuerung der Microsoft Xbox 360.
-%	\item Durch günstigen Preis, mittlerweile 20€ für ein gebrauchtes Gerät sehr beliebt.
-%	\item durch quelloffene Treiber und Libraries breites Einsatzspektrum
-%	\end{itemize}
-		\subsection{Fotosensor}
-		Die Kinect verfügt über eine Kombination von Farb- und Tiefenkamera. Beim Farbsensor handelt es sich um einen herkömmlichen VGA-Sensor welcher Farbwerte im RGB-24Bit Farbraum liefert. Bilder werden zunächst mit einer Auflösung von $1280*960$ Pixel aufgenommen, anschließend allerdings auf $640*480$ Pixel per downsampling herunterreduziert. Das Aufnahmefeld erstreckt sich über 57 Grad Horizontal und 43 Grad Vertikal.
-%			\begin{itemize}
-%			\item VGA-Camera RGB-Farbwerte 1280x960 Pixel
-%			\item downsampling auf 640x480 Pixel
-%			\item Aufnahmefeld von 57 Grad vertical und 43 Grad horizontal
-%			\end{itemize}
-			\cite{kinect-georg}
-		\subsection{Tiefenbild-System}
-		Tiefenbilder werden durch eine Kombination von IR-Laser Emitter und Sensor erzeugt. Der Emitter bestrahlt die Umgebung in einem Winkel von $58$Grad Horizontal und $45$Grad Vertikal mit einem pseudorandom IR-Muster. Diese Technik funktioniert in Bereichen mit viel natürlich Licht nur mit schweren Einschränkungen. Natürliches Licht enthält ebenfalls Infrarote Strahlung, welche zu Interferenzen mit dem IR-Muster des Emitters führt. Der Sensor kann somit das erzeugte Mesh nicht mehr eindeutig identifizieren und erzeugt somit ein extrem chaotisches Bild, welches sich durch starkes Rauschen äußert. Der Laser des Emitters arbeitet mit einer Leistung von 70mW und ist somit nit eyesafe. PrimeSense hat eine patentierte Methode entwickelt welche den Einsatz ohne Schutzbrille ermöglicht. Laserlicht wird in der Regel mit einer Diode erzeugt. Dioden erzeugen punktgerichtete Strahlen. Dadurch ist bei der Betrachtung des Meshes im Bildzentrum ein Punkt mit höherer Intensität als die restlichen Lichtpunkte zu erkennen. Durch die scattering genannte Methode wird dieser zentrale Punkt auf 9 unterschiedliche Punkte durch Streuung verteilt. Dadurch wird auch die Intensität der einzelnen Scatter-Points auf $\frac{1}{9}$ reduziert, was es für das menschliche Auge unbedenklich macht. Der Emitter erzeugt zunächst ein Mesh mit einer Auflösung von $1200*960$ Pixeln. Im Nachhinein wird die Auflösung allerdings durch downsampling auf $640*490$ Pixel reduziert. Dies ist nötig da der USB-Stack das begrenzende Medium darstellt, und ansonsten die zeitgerechte Übertragung des Farb sowie des Tiefenbildes nicht sichergestellt werden kann. Microsoft gibt einen Funktionsbereich von 0,8m bis 3,5m an, welcher sich allerdings in praktischen Anwendungen auf 0,5 bis 3m eingependelt hat. Die Monochrom Kamera arbeitet mit einer nativen Auflösung von $1280*1024$ Pixel, welche allerdings bereits vor dem downsampling verkleinert wurde. Die Tiefenbilder enthalten Tiefenwerte im Wertebereich von 13Bit.
-			%\begin{itemize}
-			%\item IR-Laser Emitter
-			%\item gibt 830nm IR-Muster ab
-			%\item funktioniert nur eingeschränkt in bereichen mit viel natürlichem Licht. natürliches Licht enthält auch IR Strahlung i.e. Interferenz mit Emitter-Strahlung
-		%	%\item nicht eye-safe da 70mW, nur durch scattering eye safe
-		%	\item scattering, Diode strahlt Punktförmig ab. Dadurch extrem hellen zentralen Punkt in Emitter-Muster. Scattering teilt diesen zentralen Punkt in 9 verschobene Punkte auf. Dadurch Strahlungsintensität eines Punktes $\frac{1}{9}$ 
-		%	\item 30 Hz und 1200*960 Pixel, durch Hardware downsampling da USB-Stack limitiert.
-		%	\item Feldauslöchte = 58-Grad horizontal und 45-Grad vertical bzw 70-Grad diagonal
-		%	\item Funktionsbereich von 80cm bis 3,5m.
-		%	\item die Monochrom Camera arbeitet auf einer nativen Auflösung von 1280x1024 Pixel, das Bild wurde sogar schon vor dem Downsampling verkleinert.
-		%	\item pro Pixel 13 Bit Tiefenwert in Millimeter(ganzzahlig) 40cm bis 4m 30 fps
-		%	\end{itemize}
-			\cite{kinect-hacking}
-		\subsection{Funktionsweise}
-%			\subsubsection{Time of Flight}
-%			\begin{itemize}
-%			\item Time of Flight Lichtlaufzeitverfahren
-%			\item methode zur Entfernungsbestimmung
-%			\item Licht bestimmte Geschwindigkeit in abh"angigkeit vom Medium
-%			\item Lichtstrahl von Sensor(applikator) abstrahlen
-%			\item Lichtstrahl prallt an objekt ab und wird auf sensor(empfänger) zurückgeworfen
-%			\item Mit gemessener Zeit und relativer Lichtgeschwindigkeit im Medium kann entfernung des reflektierenden Objekts gemessen werden.
-%			\item $S=v*t$ \textit{v} = velocity, Geschwindigkeit. \textit{t} = time, Zeit.
-%			\item Lichtgeschwindigkeit in Bodennaher Atmosphäre ca 0,28 \% geringer als im Vakuum
-%			\item $299.792,458 -- 299.710 \frac{Km}{s}$ 
-%			\end{itemize}
-			\subsubsection{light coding}
-			Das Tiefensystem der Kinect unterstützt keine Laufzeitmessung. Stattdessen wird \textit{structured light} verwendet. Dabei wird ein vorher definiertes Muster durch einen Emitter auf eine Fläche projiziert. Das Muster ist aus Punkten zusammengesetzt. Innerhalb des Musters gibt es keine Wiederholungen, was dazu führt dass jeder Punkt innerhalb des Bildes eindeutig identifziert werden kann. Bei der Kinect kommt entgegen des herkömmlichen Vorgehens zwei versetzte Bildsensoren zu verwenden nur ein einzelner zum Zug. Das Bild des fehlenden Sensors wird durch ein hart-codiertes Bild substituiert. Dieses Bild wird als Referenzobjekt für den Wertevergleich mit dem vom Sensor empfangenen Muster genutzt. Dabei werden per stereo triangulationsverfahren die räumlichen Unterschiede der in beiden bildern bekannten Punkte berechnet. Hierbei dienen die Intensitätsunterschiede der Punkte als Berechnungsgrundlage. Ist der vom Sensor empfangene Punkt intensiver als der selbe Punkt im Referenzbild, ist der Punkt näher am Sensor. Bei schwächerer Intensität liegt der reale Punkt tiefer im Raum als der Referenzpunkt.\\
-%			\begin{itemize}
-%			\item IR-Sensor in der Kinect unterstützt keine Laufzeitmessung
-%			\item nutzt stattdessen structured light. Dabei wird ein bekanntes Muster auf eine Fläche projiziert.
-%			\item innerhalb des Musters keine Wiederholungen i.e. jeder Lichtpunkt eindeutig und identifizierbar lässt sich demnach im gesamtbild wiederfinden.
-%			\item stattdessen wird das über den emitter ausgesendete und vom Sensor empfangene Bild mit einem hart codierten virtuellen Referenzbild verglichen.
-%			\item Dabei werden per stereo triangulationsverfahren die räumlichen Unterschiede der in beiden bildern bekannten Punkte berechnet. Hierbei dienen die Intensitätsunterschiede der Punkte als Berechnungsgrundlage. Ist der vom Sensor empfangene Punkt intensiver als der selbe Punkt im Referenzbild, ist der Punkt näher am Sensor.
-%			\end{itemize}
-			\cite{kinect-georg}
-			\cite{alpha-centauri-ueberlicht}
-			\cite{kinect-uug-chem}
-			
-			\begin{figure}[H]
-			\centering
-			\includegraphics[width=1.2\linewidth]{../media/kinect-depth-principle}
-			\caption{Illustration des light coding Prizips des Kinect Tiefenbildsystems.}
-			\label{fig:kinect-depth-principle}
-			\end{figure}
-			Die Werte für $d_ref$ (Tiefe des Referenzbildes) und $p$ (horizontale Distanz zwischen Emitter und Monochromer Kamera) sind bekannt. Die Strecke $s$ (horizontale Verschiebung zwischen Referenz- und Emitterbild) kann durch die eindeutig identifizierbaren Punkte errechnet werden. Die Tiefe $d$ des Punktes im Emitterbild kann durch $d = \frac{p*d_ref}{s-p}$ berechnet werden.\\
-			\cite{kinect-uug-chem}
-%			\begin{itemize}
-%			\item Werte für $d_ref, p$ bekannt
-%			\item $s$ kann berechnet werden
-%			\item $\frac{p}{d} = \frac{s}{d-d_ref} \rightarrow d = \frac{p*d_ref}{s-p}$
-%			\end{itemize}
-
-			
-
-	\section{Robot Operating System}
-	Das Akronym ROS steht für Robot Operating System. ROS ist kein wirkliches Betriebssystem auch wenn es einige Aufgaben eines OS übernimmt. Beispielsweise übernimmt es die Abstraktion von Hardware. Zusätzlich fungiert ROS wie eine Laufzeitumgebung. Es können Programme in verschiedenen Programmiersprachen wie C++, Python oder Lisp geschrieben werden. Diese Programme können die Infrastrukutur des ROS-Systems für eigene Zwecke nutzen, erweitern das System gleichzeitig auch um dessen implementierte Funktionalität. Dies geschieht über das Message System von ROS.
-		\subsection{topics}
-		Die Kommunikation innerhalb des ROS-Systems erfolgt über eine peer2peer-artige Struktur. Dies erfolgt über einen eigenen Bus für jedes Thema, im ROS-System \textit{topic} genannt. Die \textit{topics} dienen gleichzeitig als Schlagwort für die Kommunikation. Die Kommunikation über \textit{topics} findet zwischen \textit{publisher} und \textit{subscriber} statt. Dabei meldet der publisher dem zentralen Knoten des ROS-Systems dass Nachrichten über ein bestimmtes \textit{topic} ausgetauscht werden müssen. Nun können andere Publisher Nachrichten mit dem Namen des Topics als \textit{Betreff} auf den betreffenden Bus senden. Knoten für welche die Nachrichten auf dem BUS von interesse sind, melden sich als Subscriber am Bus an, und bekommen eine Benachrichtigung sobald eine neue Nachricht auf dem Bus liegt. Die Nachrichten im ROS-System als \textit{messages} bezeichnet, haben einen fest definierten Inhalt. Die Definition eigener Nachrichtentypen ist ebenfalls möglich sowie das Nutzen vorbereiteter Nachrichten. Üblicherweise verfügt jedes Paket über eigene angepasste Nachrichtentypen. Ein Beispiel über den Aufbau einer ROS-\textit{message} wird im Kapitel \textit{Hindernisse} unter dem Abschnitt \textit{Unterschiede Bilddatentypen} aufgeführt.
-%		\begin{itemize}
-%		\item Kommunikation in ROS über p2p-artige Struktur.
-%		\item ein zentraler Kommunikationsbus für jedes \"Thema\" -> Topic.
-%		\item dienen Gleichzeitig als Schlagwort für Kommunikation
-%		\item publisher/subscriber Verfahren
-%		\item initialer publisher meldet an zentralem Knoten dass Nachrichten über bestimmtes Topic ausgetauscht werden müssen.
-%		\item Nun können andere Publisher Nachrichten mit dem Namen des Topics als \textit{Betreff} auf den betreffenden Bus senden.
-%		\item Knoten für welche die Nachrichten auf dem BUS von interesse sind, melden sich als Subscriber am Bus an, und bekommen eine Benachrichtigung sobald eine neue Nachricht auf dem Bus liegt.
-%		\item Die Nachrichten im ROS-System als \textit{messages} bezeichnet, haben einen fest definierten Inhalt. Die Definition eigener Nachrichtentypen ist ebenfalls möglich wie das nutzen vorbereiteter Nachrichten. Üblicherweise verfügt jedes Packet über eigene angepasste Nachrichtentypen. Ein Beispiel über den Aufbau einer ROS-message wird im Kapitel \textit{Hindernisse} unter dem Abschnitt \textit{Unterschiede Bilddatentypen} aufgeführt.
-%		\end{itemize}
-		\begin{figure}[H]
-		\centering
-		\includegraphics[width=0.7\linewidth]{../media/rqt-graph}
-		\caption{Überblick über die Topics sowie Subscriber/Publisher Nodes eines ROS-Systems.}
-		\label{fig:rqt-graph}
-		\end{figure}
-
-		\subsection{nodes}
-		Knoten bzw \textit{nodes} sind ausführbare Programmdateien welche Aufgauben im ROS-System übernehmen. Sie erfüllen in der Regel genau einen Zweck, was dem modularen Aufbau des ROS-Systems zuspielt. Die zentrale Funktionalität wird über den ROS-Master gereitgestellt. Er stellt auch die Kommunikationsbusse für \textit{topics} bereit.
-%		\begin{itemize}
-%		\item Nodes bzw. Knoten sind ausführbare Programmdateien welche Aufgaben im ROS-System übernehmen.
-%		\item Sie erfüllen in der Regel genau einen zweck, was dem modularen Aufbau des ROS-Systems zuspielt.
-%		\item Die zentrale Funktionalität wird über den ROS-Master bereitgestellt.
-%		\item stellt Buse für die Kommunikation über Topics bereit.
-%		\end{itemize}
-		\begin{figure}[H]
-		\centering
-		\includegraphics[width=0.7\linewidth]{../media/pub_sub-1}
-		\caption{Initialer Publisher, sendet an Master dass er auf Topic T1 publishen will. Master erstellt darauf den Topic T1.}
-		\label{fig:pub_sub-1}
-		\end{figure}
-		\begin{figure}[H]
-		\centering
-		\includegraphics[width=0.7\linewidth]{../media/pub_sub-2}
-		\caption{Publisher sendet \textit{bla} an Topic T1, Subscriber liest von T1.}
-		\label{fig:pub_sub-2}
-		\end{figure}
-		
+\chapter{Problemstellung}
+In den meisten Projekten die sich mit autonomen Systemen befassen ist die Intelligenz sehr stark an den Roboter bzw. die Basisplattform gebunden. Die Aufgabe dieses Projektes soll es sein erste Versuche darin zu unternehmen eine physikalische Trennung zwischen Intelligenz und mobiler Plattform zu erreichen. Genauer soll die Steuerung des Roboters in eine periphere Infrastruktur verlagert werden.\\
+Dadurch entstehen folgende Aufgabenbereiche:
+\begin{itemize}
+\item Die Kommunikation zwischen den beteiligten Elementen mobile Plattform, intelligente Infrastruktur, Benutzer sicherstellen.
+\item Die Integration des Parallelprojekts von Daniel Geiger TINF13B2
+\item Sinnvolle Architektur der Infrastruktur
+\item Integration Erfassender Komponenten in die Infrastruktur
+\item Basis für die Wegfindung der mobilen Plattform
+\item Erkennen von Hindernissen innerhalb des Bewegungsraums
+\item Reaktion auf erfasste Hindernisse
+\item Identifikation und Ortung der Plattform im Bewegungsraum
+\end{itemize}
+\section{Erwartetes Ergebnis}
+Das erwartete Ergebnis dieses Projekts ist dass sich die mobile Plattform innerhalb einer begrenzten und definierten Umgebung autonom bewegen kann. Sie reagiert selbstständig auf auftauchende Hindernisse. Das autonome Bewegen soll durch einen benutzerseitigen Trigger initiiert werden.

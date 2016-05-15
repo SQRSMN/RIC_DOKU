@@ -1,6 +1,6 @@
 %!TEX root = ../dokumentation.tex
 \chapter{Reaktion auf Hindernisse}
-Reaktion kommt vom alt-lateinischen \textit{reactio} und bedeutet Rückhandlung. Genauer bedeutet es sein eigenes Verhalten an Etwas anzupassen. Lebewesen reagieren auf Umwelteinflüsse auf der Basis von Annahmen und Erfahrung. Diese Erfahrung wird durch wiederholtes Analysieren unterschiedlichster Situationen gewonnen. Die Annahmen bestehen aus dem Vergleich und der Kombination von Erfahrungen. Ein Roboter selbst, ist dazu allerdings nicht in der Lage. Ein solches Verhalten kann allerdings antrainiert werden. Dazu müssen die Merkmale zum deuten der Situation und die adäquate Verhaltensweise vorgegeben werden. Diese Informationen können durch das Modellieren einer solchen Situation erhoben werden.
+Reaktion kommt vom alt-lateinischen \textit{reactio} und bedeutet Rückhandlung. Genauer bedeutet es sein eigenes Verhalten an Etwas anzupassen. Lebewesen reagieren auf Umwelteinflüsse auf der Basis von Annahmen und Erfahrung. Diese Erfahrung wird durch wiederholtes Analysieren unterschiedlichster Situationen gewonnen. Die Annahmen bestehen aus dem Vergleich und der Kombination von Erfahrungen. Ein Roboter selbst, ist dazu allerdings nicht in der Lage. Ein solches Verhalten kann allerdings an trainiert werden. Dazu müssen die Merkmale zum deuten der Situation und die adäquate Verhaltensweise vorgegeben werden. Diese Informationen können durch das Modellieren einer solchen Situation erhoben werden.
 
 %\begin{itemize}
 %\item was bedeutet reagieren?
@@ -9,14 +9,14 @@ Reaktion kommt vom alt-lateinischen \textit{reactio} und bedeutet Rückhandlung.
 %\item Annahmen beruhen auf Erfahrung
 %\item Erfahrung durch stetige Beobachtung von Situationen und Analyse der Ergebnisse
 %\item Roboter selbst kann so etwas nicht
-%\item Verhalten kann aber antrainiert werden
+%\item Verhalten kann aber an trainiert werden
 %\item dazu müssen Verhaltensweise und Merkmale zum deuten der Situation gegeben werden
-%\item Eventueller Lösungsweg durch Systemmodellierung via Bayessches Netz
+%\item Eventueller Lösungsweg durch Systemmodellierung via Bayes'sches Netz
 %\end{itemize}
 \section{Modellierung von Situationen}
 Eine Situation kann als geschlossenes System betrachtet werden. An einer Situation sind unterschiedliche Elemente beteiligt. Jedes Element verhält sich unterschiedlich. Jedes Element weist zudem verschiedene Verhaltensmuster auf. Ein System enthält Variablen. Jede Variable kann verschiedene Zustände annehmen. Somit lässt sich eine Abbildung von Elementen auf Variablen durchführen. Die Verhaltensmuster eines Elements sind die Zustände einer Variable. Ein Beispiel hierfür lässt sich anhand des Roboters und seines Verhaltens aufzeigen. Der Roboter selbst ist eine Variable. Der Roboter soll sich innerhalb eines Raumes auf dem Boden bewegen. Sein Zustand ist während dem er sich bewegt \textit{moving}. Er bewegt sich jedoch nicht die ganze Zeit, sondern nur wenn er einen Auftrag bekommt, sich an eine Position zu begeben. Wenn er sich nicht bewegt wartet er auf einen Auftrag. Somit ist ein weiterer Zustand \textit{waiting}.
 %\begin{itemize}
-%\item Was ist eine Situation; Kann als geschlossenes System bertrachtet werden;
+%\item Was ist eine Situation; Kann als geschlossenes System betrachtet werden;
 %\item Situation enthält teilnehmende Elemente; Elemente weisen ein Verhalten auf;
 %\item Elemente bilden die Variablen eines Systems dar; Das Verhalten wiederum der Zustand dieser Variable; Für jedes Verhaltensmuster ein eigener Zustand
 %\end{itemize}
@@ -51,12 +51,18 @@ Anhand des Settings können nun folgende Klassen von Hindernissen geschaffen wer
 \item \textbf{lineare Objekte} bewegen sich auf einem festen geraden Pfad durch den Raum.
 \item \textbf{dynamische Objekte} bewegen sich auf keinem ersichtlichen Pfad durch den Raum.
 \item \textbf{statische Objekte} sind entweder lineare oder dynamische Objekte welche die Bewegung abgebrochen haben und an einer festen Position innerhalb des Raumes verweilen.
-\item \textbf{periphere Objkete} streifen den Bewegungsraum des Roboters nur oberflächlich, und verlassen ihn sofort wieder.
+\item \textbf{periphere Objekte} streifen den Bewegungsraum des Roboters nur oberflächlich, und verlassen ihn sofort wieder.
 \end{itemize}
 
 \subsection{Konzept Bewegungsanalyse}
-Die Klassifizierung der aufgeführten Objekte basiert auf deren Bewegungsmuster. Eine Voraussetzung für die Implementierung dieser Klassen besteht darin die Bewegung von Objekten nachvollziehen zu können. Die Bewegung selbst stellt sich als Positionsänderung zwischen zwei Frames dar. Das Problem liegt hier nun darin eine Verbindung zwischen den beiden Koordinaten über mehrere Frames hinweg zu realisieren, ohne dabei die Objektzugehörigkeit zu verlieren. Dies ließe sich durch eine Zuteilung eines Identifikators zu jedem Objekt realisieren. Dies kann auf die selbe Weise geschehen wie die Identifikation der mobilen Plattform. Da für jedes beliebige Objekt ein Template erstellt werden müsste, mehrere sogar wenn perspektivische Verschiebungen ausgeglichen werden müssen, wäre der Aufwand zu groß um diesen Lösungsansatz praktisch umzusetzen.\\ Ungeachtet der Identifikation der Objekte stellt das Verfolgen der Objektmittelpunkte eine umsetzbare Lösung dar. Die Verschiebung ließe sich in Bildpunkten messen. Als Datenstruktur ist ein Vector ideal. Orientierung und Länge des Vectors überschneiden sich mit Richtung und Geschwindigkeit des Objekts. Die Richtung des Objects liese sich über die Verschiebung in der 4er oder 8er Nachbarschaft ablesen, die Geschwindigkeit über die Differenz von $n$-Pixel pro Frame.
-\textbf{(ADD)SCHEMA(ADD)}
+Die Klassifizierung der aufgeführten Objekte basiert auf deren Bewegungsmuster. Eine Voraussetzung für die Implementierung dieser Klassen besteht darin die Bewegung von Objekten nachvollziehen zu können. Die Bewegung selbst stellt sich als Positionsänderung zwischen zwei Frames dar. Das Problem liegt hier nun darin eine Verbindung zwischen den beiden Koordinaten über mehrere Frames hinweg zu realisieren, ohne dabei die Objektzugehörigkeit zu verlieren. Dies ließe sich durch eine Zuteilung eines Identifikators zu jedem Objekt realisieren. Dies kann auf die selbe Weise geschehen wie die Identifikation der mobilen Plattform. Da für jedes beliebige Objekt ein Template erstellt werden müsste, mehrere sogar wenn perspektivische Verschiebungen ausgeglichen werden müssen, wäre der Aufwand zu groß um diesen Lösungsansatz praktisch umzusetzen.\\ Ungeachtet der Identifikation der Objekte stellt das Verfolgen der Objektmittelpunkte eine umsetzbare Lösung dar. Die Verschiebung ließe sich in Bildpunkten messen. Als Datenstruktur ist ein Vector ideal. Orientierung und Länge des Vector überschneiden sich mit Richtung und Geschwindigkeit des Objekts. Die Richtung des Objects ließe sich über die Verschiebung in der 4er oder 8er Nachbarschaft ablesen, die Geschwindigkeit über die Differenz von $n$-Pixel pro Frame.
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{../media/vec-obj1}
+\caption[Vektor Objekt]{Vektordarstellung der Bewegung eines Objekts.}
+\label{fig:vec-obj1}
+\end{figure}
+
 %\begin{itemize}
 %\item Klassifizierung durch bewegungsmuster
 %\item Voraussetzung Die Bewegung von Objekten nachvollziehen.
@@ -68,5 +74,10 @@ Die Klassifizierung der aufgeführten Objekte basiert auf deren Bewegungsmuster.
 %\item schema in visio
 %\end{itemize}
 \subsection{Konzept Hindernis umfahren}
-Das Umfahren von Hindernissen ist nur bei statischen Objekten sinnvoll. Das Verhalten mobiler Objekte lässt sich nur schwer schätzen. Für die Modellierung von Ausweichrouten eignen sich Baiser Kurven. Die benötigten Start und Endpunkte der Kurve sind bereits bekannt. Hierfür können die aktuelle Position des Roboters und die Zielkoordinate des Roboters benutzt werden. Baiser Kurven werden über Hilfspunkte aufgespannt. Je mehr Hilfspunkte bekannt sind desto stärker wird die Kurve gekrümmt. Geeignete Hilfspunkte können auf einfache Art berechnet werden. Das Objekt liegt auf der Verbindungsachse zwischen mobiler Plattform und Zielpunkt. Nun kann vom Mittelpunkt des Störobjekts ein Vector aufgespannt werden der orthogonal auf die Verbindungsachse zeigt. Dieser Vector wird nun um den Durchmesser des Objekts Verlängert. Dadurch kann nun eine Kurve aufgespannt werden, die weit genug um das Hindernis herumführt, sodass der Roboter keine Gefahr läuft hängen zu bleiben.
-\textbf{(ADD) Schema(ADD)}
+Das Umfahren von Hindernissen ist nur bei statischen Objekten sinnvoll. Das Verhalten mobiler Objekte lässt sich nur schwer schätzen. Für die Modellierung von Ausweichrouten eignen sich Baiser Kurven. Die benötigten Start und Endpunkte der Kurve sind bereits bekannt. Hierfür können die aktuelle Position des Roboters und die Zielkoordinate des Roboters benutzt werden. Bezier Kurven werden über Hilfspunkte aufgespannt. Je mehr Hilfspunkte bekannt sind desto stärker wird die Kurve gekrümmt. Geeignete Hilfspunkte können auf einfache Art berechnet werden. Das Objekt liegt auf der Verbindungsachse zwischen mobiler Plattform und Zielpunkt. Nun kann vom Mittelpunkt des Störobjekts ein Vector aufgespannt werden der orthogonal auf die Verbindungsachse zeigt. Dieser Vector wird nun um den Durchmesser des Objekts Verlängert. Dadurch kann nun eine Kurve aufgespannt werden, die weit genug um das Hindernis herumführt, sodass der Roboter keine Gefahr läuft hängen zu bleiben.
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\linewidth]{../media/obj-curve}
+\caption{Umfahrung eines Störobjekts, Streckenermittlung per Bezier-Kurve.}
+\label{fig:obj-curve}
+\end{figure}

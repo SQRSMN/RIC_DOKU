@@ -1,0 +1,110 @@
+% This file was created with JabRef 2.10b2.
+% Encoding: UTF-8
+
+
+@Article{kinect-georg,
+  Title                    = {Kinect als Eingabegerät},
+  Author                   = {Jan Georg},
+
+  Owner                    = {simon},
+  Timestamp                = {2016.04.25}
+}
+
+@Book{kinect-hacking,
+  Title                    = {Hacking the Kinect},
+  Author                   = {Kramer, Burrus, Echtler,Herrera, Parker},
+
+  Date                     = {2012}
+}
+
+@Misc{alpha-centauri-ueberlicht,
+  Title                    = {Alpha Centauri: gibt es Überlichtgeschwindigkeit},
+
+  Author                   = {Prof. Harald Lesch},
+  HowPublished             = {online Mediathek},
+  Month                    = {Juli},
+  Year                     = {2004},
+
+  Owner                    = {simon},
+  Timestamp                = {2016.04.25},
+  Url                      = {http://www.br.de/mediathek/video/sendungen/alpha-centauri/alpha-centauri-ueberlichtgeschwindigkeit-harald-lesch100.html}
+}
+
+@Electronic{cv-filter,
+  Title                    = {image filtering},
+  Author                   = {OpenCV},
+  Url                      = {http://docs.opencv.org/2.4/modules/imgproc/doc/filtering.html},
+
+  Owner                    = {simon},
+  Timestamp                = {2016.04.30}
+}
+
+@Electronic{cv-findcontours,
+  Title                    = {Structural Analysis and Shape Descriptors},
+  Author                   = {OpenCV},
+  Url                      = {http://docs.opencv.org/2.4/modules/imgproc/doc/structural_analysis_and_shape_descriptors.html#void%20findContours%28InputOutputArray%20image,%20OutputArrayOfArrays%20contours,%20OutputArray%20hierarchy,%20int%20mode,%20int%20method,%20Point%20offset%29},
+
+  Owner                    = {simon},
+  Timestamp                = {2016.05.01}
+}
+
+@Electronic{cv-thresh,
+  Title                    = {Miscellaneous Image Transformations/threshold},
+  Author                   = {OpenCV},
+  Url                      = {http://docs.opencv.org/2.4/modules/imgproc/doc/miscellaneous_transformations.html?highlight=threshold#double%20threshold%28InputArray%20src,%20OutputArray%20dst,%20double%20thresh,%20double%20maxval,%20int%20type%29},
+
+  Owner                    = {simon},
+  Timestamp                = {2016.04.30}
+}
+
+@Electronic{opencv-floodfill,
+  Author                   = {OpenCV},
+  Url                      = {http://docs.opencv.org/2.4/modules/imgproc/doc/miscellaneous_transformations.html},
+
+  Owner                    = {simon},
+  Timestamp                = {2016.05.01}
+}
+
+@MastersThesis{unger13,
+  Title                    = {Automatisierung der Kartographie von Straßenschildern},
+  Author                   = {Philipp Unger},
+  School                   = {Universität Passau},
+  Year                     = {2013},
+
+  Owner                    = {simon},
+  Timestamp                = {2016.04.30},
+  Url                      = {https://www.forwiss.uni-passau.de/extern/doc/BA_Unger.pdf}
+}
+
+@Electronic{lode-floodfill,
+  Title                    = {Flood Fill},
+  Author                   = {Lode Vandevenne},
+  HowPublished             = {website},
+  Language                 = {english},
+  Url                      = {http://lodev.org/cgtutor/floodfill.html},
+  Year                     = {2007},
+
+  Owner                    = {simon},
+  Timestamp                = {2016.05.01}
+}
+
+@Electronic{kinect-uug-chem,
+  Title                    = {Kinect-Programmierung},
+  Author                   = {Yvonne Mußmacher, Mario Haustein},
+  Language                 = {deutsch},
+  Month                    = {Januar},
+  Url                      = {https://www.tu-chemnitz.de/urz/stammtisch/rsrc/beamer.pdf},
+  Year                     = {2013},
+
+  Owner                    = {simon},
+  Timestamp                = {2016.04.26}
+}
+
+@Electronic{duden-hinderniss,
+  Title                    = {duden.de},
+  Url                      = {http://www.duden.de/rechtschreibung/Hindernis},
+
+  Owner                    = {simon},
+  Timestamp                = {2016.04.28}
+}
+
